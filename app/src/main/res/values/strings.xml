@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">SAMATIF</string>
+    <string name="surah">Surah</string>
+    <string name="kelancaran">Kelancaran</string>
+    <string name="tajwid">Tajwid</string>
+    <string name="makhrajul">Makhrajul Huruf</string>
+</resources>
