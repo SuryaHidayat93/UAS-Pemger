@@ -8,12 +8,13 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-
 import android.view.View;
+import android.widget.TextView;
 
 public class BerandaDosenActivity extends AppCompatActivity {
 
     DrawerLayout drawerLayout;
+    TextView namaUserTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -21,24 +22,40 @@ public class BerandaDosenActivity extends AppCompatActivity {
         setContentView(R.layout.activity_berandadosen);
 
         drawerLayout = findViewById(R.id.drawer_layer);
+
+        // Mengakses TextView dari sidebardosen.xml
+        View sidebarView = findViewById(R.id.namauser);  // Pastikan ID ini sesuai dengan layout sidebardosen.xml
+        namaUserTextView = sidebarView.findViewById(R.id.namauser);
+
+        // Get the username from the intent
+        Intent intent = getIntent();
+        String username = intent.getStringExtra("USERNAME");
+
+        // Set the username to the TextView
+        if (username != null) {
+            namaUserTextView.setText(username);
+        }
     }
 
-    public void ClickMenu(View view) {openDrawer(drawerLayout);}
+    public void ClickMenu(View view) {
+        openDrawer(drawerLayout);
+    }
 
-    private void openDrawer(DrawerLayout drawerLayout){
+    private void openDrawer(DrawerLayout drawerLayout) {
         drawerLayout.openDrawer(GravityCompat.START);
     }
 
-    public void beranda(View view){
+    public void beranda(View view) {
         Intent intent = new Intent(BerandaDosenActivity.this, BerandaDosenActivity.class);
         startActivity(intent);
     }
-    public void setoran(View view){
+
+    public void setoran(View view) {
         Intent intent = new Intent(BerandaDosenActivity.this, SetoranDosenActivity.class);
         startActivity(intent);
     }
 
-    public void riwayat(View view){
+    public void riwayat(View view) {
         Intent intent = new Intent(BerandaDosenActivity.this, RiwayatDosenActivity.class);
         startActivity(intent);
     }
@@ -69,5 +86,4 @@ public class BerandaDosenActivity extends AppCompatActivity {
         });
         builder.show();
     }
-
 }
