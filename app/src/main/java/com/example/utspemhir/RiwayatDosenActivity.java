@@ -19,9 +19,17 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.List;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 public class RiwayatDosenActivity extends AppCompatActivity implements MyAdapter.ItemClickListener {
 
     DrawerLayout drawerLayout;
+    RecyclerView recyclerView;
+    MyAdapter adapter;
+    List<Item> data = new ArrayList<>();
+    Spinner spinner;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,33 +37,26 @@ public class RiwayatDosenActivity extends AppCompatActivity implements MyAdapter
         setContentView(R.layout.activity_riwayatdosen);
 
         drawerLayout = findViewById(R.id.drawer_layer);
-        RecyclerView recyclerView = findViewById(R.id.recyclerview);
+        recyclerView = findViewById(R.id.recyclerview);
+        spinner = findViewById(R.id.spinner);
 
-        List<Item> data = new ArrayList<>();
-        data.add(new Item("Nama: Farras Lathief","Nim: 12250111328", "Semester 4", R.drawable.gambar1));
-        data.add(new Item("Nama: Mahasiswa 2","Nim: 12250111514", "Semester 4", R.drawable.gambar1));
-        data.add(new Item("Nama: Mahasiswa 3","Nim: 12250120341","Semester 4", R.drawable.gambar1));
-        data.add(new Item("Nama: Mahasiswa 4","Nim: 12250111514", "Semester 6",R.drawable.gambar1));
-        data.add(new Item("Nama: Mahasiswa 5","Nim: 12250120341", "Semester 8",R.drawable.gambar1));
-
-        MyAdapter adapter = new MyAdapter(this, data, this);
+        adapter = new MyAdapter(this, data, this);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
 
-        // Dropdown (Spinner)
-        Spinner spinner = findViewById(R.id.spinner);
+        // Inisialisasi Spinner
+        initializeSpinner();
 
-        // Sample data
+        // Ambil data dari endpoint
+        fetchDataFromEndpoint();
+    }
+
+    private void initializeSpinner() {
         String[] items = {"", "Semester 1", "Semester 2", "Semester 3", "Semester 4", "Semester 5"};
-
-        // Create adapter
         ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, items);
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
-        // Set adapter to Spinner
         spinner.setAdapter(spinnerAdapter);
 
-        // Reaction to selection
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -65,7 +66,36 @@ public class RiwayatDosenActivity extends AppCompatActivity implements MyAdapter
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-                // Do nothing if nothing selected
+                // Tidak ada yang dipilih
+            }
+        });
+    }
+
+    private void fetchDataFromEndpoint() {
+        ApiService apiService = RetrofitClient.getClient("https://samatif.000webhostapp.com/").create(ApiService.class);
+        Call<DosenResponse> call = apiService.getDosenByNip("19981");
+
+        call.enqueue(new Callback<DosenResponse>() {
+            @Override
+            public void onResponse(Call<DosenResponse> call, Response<DosenResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    List<Dosen> dosenList = response.body().getDosen();
+                    if (!dosenList.isEmpty()) {
+                        List<Student> mahasiswaList = dosenList.get(0).getMahasiswa();
+                        data.clear();
+                        for (Student student : mahasiswaList) {
+                            data.add(new Item("Nama: " + student.getNama(), "Nim: " + student.getNIM(), "Semester " + student.getSemester(), R.drawable.gambar1));
+                        }
+                        adapter.notifyDataSetChanged();
+                    }
+                } else {
+                    Toast.makeText(RiwayatDosenActivity.this, "Gagal mengambil data", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<DosenResponse> call, Throwable t) {
+                Toast.makeText(RiwayatDosenActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -74,23 +104,22 @@ public class RiwayatDosenActivity extends AppCompatActivity implements MyAdapter
         openDrawer(drawerLayout);
     }
 
-    private void openDrawer(DrawerLayout drawerLayout){
+    private void openDrawer(DrawerLayout drawerLayout) {
         drawerLayout.openDrawer(GravityCompat.START);
     }
 
-    public void beranda(View view){
+    public void beranda(View view) {
         Intent intent = new Intent(RiwayatDosenActivity.this, BerandaDosenActivity.class);
         startActivity(intent);
     }
 
-    public void setoran(View view){
+    public void setoran(View view) {
         Intent intent = new Intent(RiwayatDosenActivity.this, SetoranDosenActivity.class);
         startActivity(intent);
     }
 
-    public void riwayat(View view){
-        Intent intent = new Intent(RiwayatDosenActivity.this, RiwayatDosenActivity.class);
-        startActivity(intent);
+    public void riwayat(View view) {
+        // Tidak ada tindakan karena Anda sudah berada di RiwayatDosenActivity
     }
 
     public void logout(View view) {
@@ -104,10 +133,8 @@ public class RiwayatDosenActivity extends AppCompatActivity implements MyAdapter
         builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                // Start LoginActivity
                 Intent intent = new Intent(RiwayatDosenActivity.this, LoginActivity.class);
                 startActivity(intent);
-                // Finish current activity
                 finish();
             }
         });
