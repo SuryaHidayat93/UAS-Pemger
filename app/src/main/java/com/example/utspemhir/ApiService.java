@@ -29,4 +29,10 @@ public interface ApiService {
             @Field("tajwid") String tajwid,
             @Field("makhrajul_huruf") String makhrajulHuruf
     );
+
+    @GET("setoran/sudahbelum.php")
+    Call<SurahResponse> getSurahDetails(@Query("nim") String nim);
+
+    @GET("setoran/by-nim.php")
+    Call<SetoranResponse> getSetoranDetails(@Query("nim") String nim);
 }

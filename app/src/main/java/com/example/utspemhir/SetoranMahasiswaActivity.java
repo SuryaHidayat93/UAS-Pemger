@@ -1,46 +1,259 @@
 package com.example.utspemhir;
 
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.view.GravityCompat;
-import androidx.drawerlayout.widget.DrawerLayout;
-
+import android.Manifest;
+import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.pdf.PdfDocument;
 import android.os.Bundle;
+import android.os.Environment;
 import android.view.View;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class SetoranMahasiswaActivity extends AppCompatActivity {
 
+    private static final int PERMISSION_REQUEST_CODE = 1;
     DrawerLayout drawerLayout;
+    RecyclerView recyclerView;
+    TableAdapter tableAdapter;
+    List<TableRow> tableRows;
+    TextView downloadButton;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_setoranmahasiswa);
 
         drawerLayout = findViewById(R.id.drawer_layer);
+        recyclerView = findViewById(R.id.recycler_view);
+        downloadButton = findViewById(R.id.download);
+
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        tableRows = new ArrayList<>();
+        tableAdapter = new TableAdapter(tableRows);
+        recyclerView.setAdapter(tableAdapter);
+
+        fetchSurahData();
+
+        // Set download button click listener
+        downloadButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (checkPermission()) {
+                    Bitmap recyclerViewScreenshot = getRecyclerViewScreenshot(recyclerView);
+                    saveBitmapAsPDF(recyclerViewScreenshot);
+                } else {
+                    requestPermission();
+                }
+            }
+        });
     }
 
-    public void ClickMenu(View view) {openDrawer(drawerLayout);}
+    private Bitmap getRecyclerViewScreenshot(RecyclerView view) {
+        RecyclerView.Adapter adapter = view.getAdapter();
+        if (adapter == null) {
+            return null;
+        }
 
-    private void openDrawer(DrawerLayout drawerLayout){
+        int itemCount = adapter.getItemCount();
+        int totalHeight = 0;
+        int totalWidth = view.getWidth();
+
+        // Inflate the header view
+        View headerView = getLayoutInflater().inflate(R.layout.table_header, null);
+        headerView.measure(
+                View.MeasureSpec.makeMeasureSpec(totalWidth, View.MeasureSpec.EXACTLY),
+                View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
+        );
+        headerView.layout(0, 0, headerView.getMeasuredWidth(), headerView.getMeasuredHeight());
+        headerView.setDrawingCacheEnabled(true);
+        headerView.buildDrawingCache();
+        Bitmap headerBitmap = Bitmap.createBitmap(headerView.getDrawingCache());
+        headerView.setDrawingCacheEnabled(false);
+
+        totalHeight += headerView.getMeasuredHeight();
+
+        List<Bitmap> bitmaps = new ArrayList<>();
+
+        for (int i = 0; i < itemCount; i++) {
+            RecyclerView.ViewHolder holder = adapter.createViewHolder(view, adapter.getItemViewType(i));
+            adapter.onBindViewHolder(holder, i);
+            holder.itemView.measure(
+                    View.MeasureSpec.makeMeasureSpec(totalWidth, View.MeasureSpec.EXACTLY),
+                    View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
+            );
+            holder.itemView.layout(0, 0, holder.itemView.getMeasuredWidth(), holder.itemView.getMeasuredHeight());
+            holder.itemView.setDrawingCacheEnabled(true);
+            holder.itemView.buildDrawingCache();
+            bitmaps.add(Bitmap.createBitmap(holder.itemView.getDrawingCache()));
+            holder.itemView.setDrawingCacheEnabled(false);
+
+            totalHeight += holder.itemView.getMeasuredHeight();
+        }
+
+        Bitmap bigBitmap = Bitmap.createBitmap(totalWidth, totalHeight, Bitmap.Config.ARGB_8888);
+        Canvas bigCanvas = new Canvas(bigBitmap);
+        Paint paint = new Paint();
+        int heightOffset = 0;
+
+        // Draw the header bitmap on the big canvas
+        bigCanvas.drawBitmap(headerBitmap, 0f, heightOffset, paint);
+        heightOffset += headerBitmap.getHeight();
+        headerBitmap.recycle();
+
+        for (Bitmap bitmap : bitmaps) {
+            bigCanvas.drawBitmap(bitmap, 0f, heightOffset, paint);
+            heightOffset += bitmap.getHeight();
+            bitmap.recycle();
+        }
+
+        return bigBitmap;
+    }
+
+
+    private void saveBitmapAsPDF(Bitmap bitmap) {
+        PdfDocument document = new PdfDocument();
+        PdfDocument.PageInfo pageInfo = new PdfDocument.PageInfo.Builder(bitmap.getWidth(), bitmap.getHeight(), 1).create();
+        PdfDocument.Page page = document.startPage(pageInfo);
+        Canvas canvas = page.getCanvas();
+        canvas.drawBitmap(bitmap, 0, 0, null);
+        document.finishPage(page);
+
+        String directoryPath = Environment.getExternalStorageDirectory().getPath() + "/Download/";
+        File file = new File(directoryPath);
+        if (!file.exists()) {
+            file.mkdirs();
+        }
+        String filePath = directoryPath + "RecyclerViewScreenshot.pdf";
+        try {
+            document.writeTo(new FileOutputStream(filePath));
+            Toast.makeText(this, "PDF Saved to " + filePath, Toast.LENGTH_LONG).show();
+        } catch (IOException e) {
+            e.printStackTrace();
+            Toast.makeText(this, "Failed to save PDF", Toast.LENGTH_SHORT).show();
+        }
+
+        document.close();
+    }
+
+    private boolean checkPermission() {
+        int result = ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        return result == PackageManager.PERMISSION_GRANTED;
+    }
+
+    private void requestPermission() {
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSION_REQUEST_CODE);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == PERMISSION_REQUEST_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Bitmap recyclerViewScreenshot = getRecyclerViewScreenshot(recyclerView);
+                saveBitmapAsPDF(recyclerViewScreenshot);
+            } else {
+                Toast.makeText(this, "Permission Denied", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    private void fetchSurahData() {
+        ApiService apiService = RetrofitClient.getClient("https://samatif.000webhostapp.com/").create(ApiService.class);
+        apiService.getSurahDetails("122501").enqueue(new Callback<SurahResponse>() {
+            @Override
+            public void onResponse(Call<SurahResponse> call, Response<SurahResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    SurahResponse surahResponse = response.body();
+                    Map<String, String> surahDates = new HashMap<>();
+
+                    // Fetch setoran data to get dates
+                    apiService.getSetoranDetails("122501").enqueue(new Callback<SetoranResponse>() {
+                        @Override
+                        public void onResponse(Call<SetoranResponse> call, Response<SetoranResponse> response) {
+                            if (response.isSuccessful() && response.body() != null) {
+                                for (SetoranResponse.Setoran setoran : response.body().getSetoran()) {
+                                    surahDates.put(setoran.getNamaSurah(), setoran.getTanggal());
+                                }
+                                updateTableRows(surahResponse, surahDates);
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call<SetoranResponse> call, Throwable t) {
+                            Toast.makeText(SetoranMahasiswaActivity.this, "Failed to fetch setoran data", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void onFailure(Call<SurahResponse> call, Throwable t) {
+                Toast.makeText(SetoranMahasiswaActivity.this, "Failed to fetch surah data", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void updateTableRows(SurahResponse surahResponse, Map<String, String> surahDates) {
+        tableRows.clear();
+        for (SurahResponse.Percentage percentage : surahResponse.getPercentages()) {
+            for (String surahName : percentage.getSurahNames()) {
+                String date = surahDates.getOrDefault(surahName, "");
+                tableRows.add(new TableRow(surahName, date, percentage.getLang(), ""));
+            }
+        }
+        tableAdapter.notifyDataSetChanged();
+    }
+
+    public void ClickMenu(View view) {
+        openDrawer(drawerLayout);
+    }
+
+    private void openDrawer(DrawerLayout drawerLayout) {
         drawerLayout.openDrawer(GravityCompat.START);
     }
 
-    public void beranda(View view){
+    public void beranda(View view) {
         Intent intent = new Intent(SetoranMahasiswaActivity.this, BerandaMahasiswaActivity.class);
         startActivity(intent);
     }
-    public void setoran(View view){
+
+    public void setoran(View view) {
         Intent intent = new Intent(SetoranMahasiswaActivity.this, SetoranMahasiswaActivity.class);
         startActivity(intent);
     }
 
-    public void riwayat(View view){
+    public void riwayat(View view) {
         Intent intent = new Intent(SetoranMahasiswaActivity.this, RiwayatMahasiswaActivity.class);
         startActivity(intent);
     }
+
     public void logout(View view) {
         logoutMenu(SetoranMahasiswaActivity.this);
     }
