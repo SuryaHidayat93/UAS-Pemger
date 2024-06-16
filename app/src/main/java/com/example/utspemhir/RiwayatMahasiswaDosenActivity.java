@@ -54,7 +54,7 @@ public class RiwayatMahasiswaDosenActivity extends AppCompatActivity {
         // Set up RecyclerView
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         dataModelList = new ArrayList<>();
-        adapter = new CustomAdapter(dataModelList);
+        adapter = new CustomAdapter(this, dataModelList); // Pass context here
         recyclerView.setAdapter(adapter);
 
         new FetchSetoranData().execute(nim);
@@ -151,7 +151,6 @@ public class RiwayatMahasiswaDosenActivity extends AppCompatActivity {
                 return null;
             }
         }
-
 
         @Override
         protected void onPostExecute(String result) {

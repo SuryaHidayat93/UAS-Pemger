@@ -6,6 +6,12 @@ public class Setoran {
     private String kelancaran;
     private String tajwid;
     private String makhrajulHuruf;
+    private String nim;
+    private String nip;
+    private int idSurah;
+
+    public Setoran(String nim, String nip, String selectedSurah, String tanggal, String selectedKelancaran, String selectedTajwid, String selectedMakhrajulKhuruf) {
+    }
 
     public String getTanggal() {
         return tanggal;
@@ -45,6 +51,30 @@ public class Setoran {
 
     public void setMakhrajulHuruf(String makhrajulHuruf) {
         this.makhrajulHuruf = makhrajulHuruf;
+    }
+
+    public String getNim() {
+        return nim;
+    }
+
+    public void setNim(String nim) {
+        this.nim = nim;
+    }
+
+    public String getNip() {
+        return nip;
+    }
+
+    public void setNip(String nip) {
+        this.nip = nip;
+    }
+
+    public int getIdSurah() {
+        return idSurah;
+    }
+
+    public void setIdSurah(int idSurah) {
+        this.idSurah = idSurah;
     }
 }
 

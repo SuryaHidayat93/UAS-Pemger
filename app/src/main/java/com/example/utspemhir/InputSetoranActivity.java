@@ -1,14 +1,13 @@
 package com.example.utspemhir;
 
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import android.app.DatePickerDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -18,9 +17,16 @@ import android.widget.DatePicker;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.utspemhir.R;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.util.Calendar;
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class InputSetoranActivity extends AppCompatActivity {
 
@@ -30,6 +36,7 @@ public class InputSetoranActivity extends AppCompatActivity {
     ArrayAdapter<String> adapterItems2;
     private DatePickerDialog datePickerDialog;
     private Button dateButton;
+    private List<Surah> surahList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,40 +59,84 @@ public class InputSetoranActivity extends AppCompatActivity {
 
         drawerLayout = findViewById(R.id.drawer_layer);
 
-        // Data for autocomplete
-        String[] items = {"An-Naba’", "AN-Naazi’at", "'Abasa'", "At-Takwir", "Al-Infithar", "Al-Muthaffifin"};
+        // Data for other autocomplete fields
         String[] items2 = {"Sangat Baik", "Baik", "Cukup", "Kurang"};
-
-        // Initialize adapter with the data
-        adapterItems = new ArrayAdapter<>(this, R.layout.list_item, items);
         adapterItems2 = new ArrayAdapter<>(this, R.layout.list_item, items2);
 
-        // Set adapter to AutoCompleteTextView
-        autoCompleteTxt.setAdapter(adapterItems);
         autoCompleteTxt2.setAdapter(adapterItems2);
         autoCompleteTxt3.setAdapter(adapterItems2);
         autoCompleteTxt4.setAdapter(adapterItems2);
 
         // Listener for item selection
-        autoCompleteTxt.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String item = parent.getItemAtPosition(position).toString();
-                // Handle item selection
-                Toast.makeText(getApplicationContext(), "Item: " + item, Toast.LENGTH_SHORT).show();
-            }
-        });
         autoCompleteTxt2.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 String item = parent.getItemAtPosition(position).toString();
-                // Handle item selection
+                Toast.makeText(getApplicationContext(), "Item: " + item, Toast.LENGTH_SHORT).show();
+            }
+        });
+        autoCompleteTxt3.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                String item = parent.getItemAtPosition(position).toString();
+                Toast.makeText(getApplicationContext(), "Item: " + item, Toast.LENGTH_SHORT).show();
+            }
+        });
+        autoCompleteTxt4.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                String item = parent.getItemAtPosition(position).toString();
                 Toast.makeText(getApplicationContext(), "Item: " + item, Toast.LENGTH_SHORT).show();
             }
         });
 
+        // Fetch data from API
+        fetchSurahData();
+
         initDatePicker();
         dateButton.setText(getTodaysDate());
+    }
+
+    private void fetchSurahData() {
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("https://samatif.000webhostapp.com/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        ApiService apiService = retrofit.create(ApiService.class);
+        Call<List<Surah>> call = apiService.getAllSurah();
+
+        call.enqueue(new Callback<List<Surah>>() {
+            @Override
+            public void onResponse(Call<List<Surah>> call, Response<List<Surah>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    surahList = response.body();
+                    String[] surahNames = new String[surahList.size()];
+
+                    for (int i = 0; i < surahList.size(); i++) {
+                        surahNames[i] = surahList.get(i).getName();
+                    }
+
+                    adapterItems = new ArrayAdapter<>(InputSetoranActivity.this, R.layout.list_item, surahNames);
+                    autoCompleteTxt.setAdapter(adapterItems);
+
+                    autoCompleteTxt.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                            String item = parent.getItemAtPosition(position).toString();
+                            Toast.makeText(getApplicationContext(), "Surah: " + item, Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                } else {
+                    showToast("Gagal mengambil data Surah");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<Surah>> call, Throwable t) {
+                showToast("Error: " + t.getMessage());
+            }
+        });
     }
 
     private String getTodaysDate() {
@@ -112,43 +163,11 @@ public class InputSetoranActivity extends AppCompatActivity {
         int month = cal.get(Calendar.MONTH);
         int day = cal.get(Calendar.DAY_OF_MONTH);
 
-
         datePickerDialog = new DatePickerDialog(this, dateSetListener, year, month, day);
-        //datePickerDialog.getDatePicker().setMaxDate(System.currentTimeMillis());
     }
 
     private String makeDateString(int day, int month, int year) {
-        return getMonthFormat(month) + " " + day + " " + year;
-    }
-
-    private String getMonthFormat(int month) {
-        if (month == 1)
-            return "JAN";
-        if (month == 2)
-            return "FEB";
-        if (month == 3)
-            return "MAR";
-        if (month == 4)
-            return "APR";
-        if (month == 5)
-            return "MAY";
-        if (month == 6)
-            return "JUN";
-        if (month == 7)
-            return "JUL";
-        if (month == 8)
-            return "AUG";
-        if (month == 9)
-            return "SEP";
-        if (month == 10)
-            return "OCT";
-        if (month == 11)
-            return "NOV";
-        if (month == 12)
-            return "DEC";
-
-        //default should never happen
-        return "JAN";
+        return String.format("%04d-%02d-%02d", year, month, day);
     }
 
     public void openDatePicker(View view) {
@@ -179,34 +198,83 @@ public class InputSetoranActivity extends AppCompatActivity {
     }
 
     public void SimpanButtonClick(View view) {
-        Intent intent = new Intent(InputSetoranActivity.this, SetoranDosenActivity.class);
-        startActivity(intent);
+        // Mengambil data nim dari Intent dan menghapus teks tambahan jika ada
+        String nim = getIntent().getStringExtra("nim").trim();
+
+        // Pastikan nim hanya berisi angka, tanpa teks tambahan
+        if (nim.startsWith("Nim:")) {
+            nim = nim.replace("Nim:", "").trim();
+        }
+
+        String nip = "19981"; // Replace with the actual NIP value
+        String tanggal = dateButton.getText().toString();
+        String kelancaran = autoCompleteTxt2.getText().toString();
+        String tajwid = autoCompleteTxt3.getText().toString();
+        String makhrajulHuruf = autoCompleteTxt4.getText().toString();
+
+        // Assuming you have a method to get the selected Surah ID
+        int idSurah = getSelectedSurahId();
+
+        // Log all the data
+        Log.d("SimpanButtonClick", "nim: " + nim);
+        Log.d("SimpanButtonClick", "nip: " + nip);
+        Log.d("SimpanButtonClick", "idSurah: " + idSurah);
+        Log.d("SimpanButtonClick", "tanggal: " + tanggal);
+        Log.d("SimpanButtonClick", "kelancaran: " + kelancaran);
+        Log.d("SimpanButtonClick", "tajwid: " + tajwid);
+        Log.d("SimpanButtonClick", "makhrajulHuruf: " + makhrajulHuruf);
+
+        if (nim != null && !nip.isEmpty() && idSurah != -1 && !tanggal.isEmpty() && !kelancaran.isEmpty() && !tajwid.isEmpty() && !makhrajulHuruf.isEmpty()) {
+            submitSetoran(nim, nip, idSurah, tanggal, kelancaran, tajwid, makhrajulHuruf);
+        } else {
+            showToast("Semua field harus diisi.");
+        }
     }
 
-    public void logout(View view) {
-        logoutMenu(InputSetoranActivity.this);
+    private int getSelectedSurahId() {
+        String selectedSurah = autoCompleteTxt.getText().toString();
+
+        // Cari Surah yang sesuai dengan nama yang dipilih
+        for (Surah surah : surahList) {
+            if (surah.getName().equals(selectedSurah)) {
+                return surah.getId();
+            }
+        }
+
+        // Jika tidak ditemukan, kembalikan -1 atau berikan notifikasi bahwa Surah tidak ditemukan
+        showToast("Surah tidak ditemukan");
+        return -1;
     }
 
-    private void logoutMenu(InputSetoranActivity mainActivity) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(mainActivity);
-        builder.setTitle("Konfirmasi");
-        builder.setMessage("Apakah anda yakin ingin keluar?");
-        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+    private void submitSetoran(String nim, String nip, int idSurah, String tanggal, String kelancaran, String tajwid, String makhrajulHuruf) {
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("https://samatif.000webhostapp.com/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        ApiService apiService = retrofit.create(ApiService.class);
+        Call<SetoranResponse> call = apiService.insertSetoran(nim, nip, idSurah, tanggal, kelancaran, tajwid, makhrajulHuruf);
+
+        call.enqueue(new Callback<SetoranResponse>() {
             @Override
-            public void onClick(DialogInterface dialog, int which) {
-                // Start LoginActivity
-                Intent intent = new Intent(InputSetoranActivity.this, LoginActivity.class);
-                startActivity(intent);
-                // Finish current activity
-                finish();
+            public void onResponse(Call<SetoranResponse> call, Response<SetoranResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    SetoranResponse apiResponse = response.body();
+                    showToast(apiResponse.getMessage());
+                } else {
+                    showToast("Gagal mengirim data setoran");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<SetoranResponse> call, Throwable t) {
+                showToast("Error: " + t.getMessage());
             }
         });
-        builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        });
-        builder.show();
+    }
+
+    private void showToast(String message) {
+        Snackbar snackbar = Snackbar.make(findViewById(android.R.id.content), message, Snackbar.LENGTH_LONG);
+        snackbar.show();
     }
 }
