@@ -22,28 +22,39 @@
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="3">
-
-            <de.hdodenhof.circleimageview.CircleImageView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:src="@drawable/gambar1"/>
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="6">
+            android:layout_weight="6"
+            android:orientation="vertical">
 
             <TextView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:id="@+id/namamahasiswa"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="60dp"
                 android:gravity="center_vertical"
-                android:text="Farras Lathief  12250111328      Semester 4"
+                android:text="Farras Lathief "
                 android:paddingLeft="10dp"
-                android:textColor="@color/white"
-                android:textSize="20dp"
+                android:textColor="@android:color/white"
+                android:textSize="20sp"
                 android:textStyle="bold"/>
+
+            <TextView
+                android:id="@+id/nim"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:textSize="20sp"
+                android:text="nim"
+                android:textColor="@android:color/white"/>
+
+            <TextView
+                android:id="@+id/semester"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:textSize="20sp"
+                android:text="semester"
+                android:textColor="@android:color/white"/>
+
         </LinearLayout>
 
         <LinearLayout
@@ -53,34 +64,34 @@
         </LinearLayout>
     </LinearLayout>
 
-        <LinearLayout
-            android:layout_width="match_parent"
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="#1e293b"
+        android:gravity="center_vertical"
+        android:onClick="beranda">
+
+        <TextView
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:background="#1e293b"
-            android:gravity="center_vertical"
-            android:onClick="beranda">
+            android:layout_weight="1"
+            android:padding="15dp"
+            android:text="Beranda"
+            android:textColor="@color/white"
+            android:textSize="20dp"
+            app:layout_constraintStart_toEndOf="@+id/imageView1"
+            tools:layout_editor_absoluteY="0dp" />
 
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:padding="15dp"
-                android:text="Beranda"
-                android:textColor="@color/white"
-                android:textSize="20dp"
-                app:layout_constraintStart_toEndOf="@+id/imageView1"
-                tools:layout_editor_absoluteY="0dp" />
-
-            <ImageView
-                android:id="@+id/imageView1"
-                android:layout_width="46dp"
-                android:layout_height="30dp"
-                android:layout_margin="48px"
-                android:src="@drawable/baseline_home_24"
-                tools:layout_editor_absoluteX="10dp"
-                tools:layout_editor_absoluteY="13dp" />
-        </LinearLayout>
+        <ImageView
+            android:id="@+id/imageView1"
+            android:layout_width="46dp"
+            android:layout_height="30dp"
+            android:layout_margin="48px"
+            android:src="@drawable/baseline_home_24"
+            tools:layout_editor_absoluteX="10dp"
+            tools:layout_editor_absoluteY="13dp" />
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"

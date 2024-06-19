@@ -52,7 +52,7 @@ public class ActivityProgress extends AppCompatActivity {
         @Override
         protected String doInBackground(String... params) {
             String nim = params[0];
-            String urlString = "https://samatif.000webhostapp.com/setoran/sudahbelum.php?nim=" + nim;
+            String urlString = "https://samatif.000webhostapp.com/setoran/sudahbelum.php?nim=122501" + nim;
             try {
                 URL url = new URL(urlString);
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();

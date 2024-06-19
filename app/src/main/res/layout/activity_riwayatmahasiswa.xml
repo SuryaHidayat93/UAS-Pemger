@@ -8,348 +8,72 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <ScrollView
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <include
+            android:id="@+id/menu_toolbar"
+            layout="@layout/menu_toolbarriwayatmahasiswa"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
         <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/recyclerView"
+            android:layout_centerInParent="true">
+
+
+
+            <Button
+                android:id="@+id/buttonprogress"
+                android:layout_width="300dp"
+                android:layout_centerHorizontal="true"
+                android:layout_height="wrap_content"
+                android:background="@drawable/button_background"
+                />
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/baseline_assessment_24"
+                android:layout_toStartOf="@id/progress"
+                android:layout_centerVertical="true"/>
+            <TextView
+                android:id="@+id/progress"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Progress"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:layout_centerInParent="true"
+
+                android:textColor="@color/white"/>
+        </RelativeLayout>
+
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <include layout="@layout/menu_toolbarriwayatmahasiswa"/>
-
-            <TableLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="5dp"
-                android:layout_marginTop="80dp"
-                android:layout_marginRight="10dp"
-                android:layout_marginBottom="20dp"
-                android:background="@color/white"
-                android:divider="?android:attr/dividerVertical"
-                android:dividerHorizontal="?android:attr/dividerHorizontal"
-                android:showDividers="beginning|middle|end"
-                android:stretchColumns="*">
-
-                <!-- Header Row -->
-                <TableRow>
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:gravity="center"
-                        android:padding="8dp"
-                        android:text="No"
-                        android:textSize="10dp"
-
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:gravity="center"
-                        android:padding="8dp"
-                        android:text="Tanggal"
-                        android:textSize="10dp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:gravity="center"
-                        android:padding="8dp"
-                        android:text="Surah"
-                        android:textSize="10dp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:gravity="center"
-                        android:padding="8dp"
-                        android:text="Kelancaran"
-                        android:textSize="10dp"
-
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:gravity="center"
-                        android:padding="8dp"
-                        android:text="Tajwid"
-                        android:textSize="10dp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="56dp"
-                        android:layout_height="match_parent"
-                        android:gravity="center"
-                        android:padding="8dp"
-                        android:text="Makhrajul Huruf"
-                        android:textSize="8dp"
-                        android:textStyle="bold" />
-                </TableRow>
-
-                <!-- Data Rows -->
-                <TableRow>
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:padding="8dp"
-                        android:text="1"
-                        android:textSize="10dp"
-                        />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:padding="8dp"
-                        android:textSize="10dp"
-                        android:text="04-04-2024" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:padding="8dp"
-                        android:textSize="10dp"
-                        android:text="An-Naba’" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:padding="8dp"
-                        android:textSize="10dp"
-                        android:text="Baik" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:padding="8dp"
-                        android:textSize="10dp"
-                        android:text="Baik"/>
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:padding="8dp"
-                        android:textSize="10dp"
-                        android:text="Cukup"/>
-                </TableRow>
-
-                <TableRow>
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:padding="8dp"
-                        android:text="2"
-                        android:textSize="10dp"
-                        />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:padding="8dp"
-                        android:textSize="10dp"
-                        android:text="05-04-2024" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:padding="8dp"
-                        android:textSize="10dp"
-                        android:text="AN-Naazi’at" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:padding="8dp"
-                        android:textSize="10dp"
-                        android:text="Baik" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:padding="8dp"
-                        android:textSize="10dp"
-                        android:text="Baik"/>
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:padding="8dp"
-                        android:textSize="10dp"
-                        android:text="Cukup"/>
-                </TableRow>
-            </TableLayout>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:padding="8dp"
-                android:layout_marginTop="220dp"
-                android:text="Kerja Praktek"/>
-
-            <ProgressBar
-                android:id="@+id/progressBar"
-                style="?android:attr/progressBarStyleHorizontal"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_marginLeft="20dp"
-                android:layout_marginTop="250dp"
-                android:layout_marginRight="20dp"
-                android:background="@color/white"
-                android:max="100" />
-
-            <TextView
-                android:id="@+id/textViewPercentage"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignEnd="@id/progressBar"
-                android:layout_marginTop="230dp"
-                android:text="25%"
-                android:textColor="@color/black"/>
+            android:layout_below="@id/menu_toolbar"
+            android:layout_marginLeft="5dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginBottom="20dp"
+            android:background="@color/white" />
 
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:padding="8dp"
-                android:layout_marginTop="280dp"
-                android:text="Seminar Kerja Praktek"/>
 
-            <ProgressBar
-                android:id="@+id/progressBar2"
-                style="?android:attr/progressBarStyleHorizontal"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_marginLeft="20dp"
-                android:layout_marginTop="310dp"
-                android:layout_marginRight="20dp"
-                android:background="@color/white"
-                android:max="100" />
-
-            <TextView
-                android:id="@+id/textViewPercentage2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignEnd="@id/progressBar"
-                android:layout_marginTop="290dp"
-                android:text="0%"
-                android:textColor="@color/black"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:padding="8dp"
-                android:layout_marginTop="340dp"
-                android:text="Judul Tugas Akhir"/>
-
-            <ProgressBar
-                android:id="@+id/progressBar3"
-                style="?android:attr/progressBarStyleHorizontal"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_marginLeft="20dp"
-                android:layout_marginTop="370dp"
-                android:layout_marginRight="20dp"
-                android:background="@color/white"
-                android:max="100" />
-
-            <TextView
-                android:id="@+id/textViewPercentage3"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignEnd="@id/progressBar"
-                android:layout_marginTop="350dp"
-                android:text="0%"
-                android:textColor="@color/black"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:padding="8dp"
-                android:layout_marginTop="400dp"
-                android:text="Seminar Proposal"/>
-
-            <ProgressBar
-                android:id="@+id/progressBar4"
-                style="?android:attr/progressBarStyleHorizontal"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_marginLeft="20dp"
-                android:layout_marginTop="430dp"
-                android:layout_marginRight="20dp"
-                android:background="@color/white"
-                android:max="100" />
-
-            <TextView
-                android:id="@+id/textViewPercentage4"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignEnd="@id/progressBar"
-                android:layout_marginTop="410dp"
-                android:text="0%"
-                android:textColor="@color/black"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:padding="8dp"
-                android:layout_marginTop="460dp"
-                android:text="Sidang Tugas Akhir"/>
-
-            <ProgressBar
-                android:id="@+id/progressBar5"
-                style="?android:attr/progressBarStyleHorizontal"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_marginLeft="20dp"
-                android:layout_marginTop="490dp"
-                android:layout_marginRight="20dp"
-                android:background="@color/white"
-                android:max="100" />
-
-            <TextView
-                android:id="@+id/textViewPercentage5"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignEnd="@id/progressBar"
-                android:layout_marginTop="470dp"
-                android:text="0%"
-                android:textColor="@color/black"/>
-
-        </RelativeLayout>
-    </ScrollView>
+    </RelativeLayout>
 
     <!-- Navigation Drawer -->
     <RelativeLayout
         android:layout_width="300dp"
         android:layout_height="match_parent"
         android:layout_gravity="start">
-        <include layout="@layout/sidebarmahasiswa"/>
+
+        <include layout="@layout/sidebarmahasiswa" />
     </RelativeLayout>
 
 </androidx.drawerlayout.widget.DrawerLayout>
