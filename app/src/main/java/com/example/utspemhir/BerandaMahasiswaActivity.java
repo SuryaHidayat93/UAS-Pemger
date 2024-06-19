@@ -12,6 +12,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.json.JSONException;
@@ -27,6 +28,9 @@ public class BerandaMahasiswaActivity extends AppCompatActivity {
 
     DrawerLayout drawerLayout;
     String token;
+    TextView namaUserTextView;
+    TextView nimTextView;
+    TextView semesterTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,12 +39,17 @@ public class BerandaMahasiswaActivity extends AppCompatActivity {
 
         drawerLayout = findViewById(R.id.drawer_layer);
 
+        // Mengakses TextViews dari sidebarmahasiswa.xml
+        View sidebarView = findViewById(R.id.sidebarmahasiswa);  // Pastikan ID ini sesuai dengan layout sidebarmahasiswa.xml
+        namaUserTextView = sidebarView.findViewById(R.id.namamahasiswa);
+        nimTextView = sidebarView.findViewById(R.id.nim);
+        semesterTextView = sidebarView.findViewById(R.id.semester);
+
         // Ambil token dari SharedPreferences
         SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
-        token = sharedPreferences.getString("jwt_token", ""); // Corrected key
+        token = sharedPreferences.getString("jwt_token", "");
 
         if (token.isEmpty()) {
-            // Handle case when token is not available
             Log.e("TOKEN_ERROR", "Token not found in SharedPreferences");
             Toast.makeText(this, "Token tidak ditemukan. Silahkan login ulang.", Toast.LENGTH_SHORT).show();
             Intent intent = new Intent(this, LoginActivity.class);
@@ -86,16 +95,13 @@ public class BerandaMahasiswaActivity extends AppCompatActivity {
         builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                // Clear SharedPreferences
                 SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
                 SharedPreferences.Editor editor = sharedPreferences.edit();
                 editor.clear();
                 editor.apply();
 
-                // Start LoginActivity
                 Intent intent = new Intent(BerandaMahasiswaActivity.this, LoginActivity.class);
                 startActivity(intent);
-                // Finish current activity
                 finish();
             }
         });
@@ -108,7 +114,6 @@ public class BerandaMahasiswaActivity extends AppCompatActivity {
         builder.show();
     }
 
-    // AsyncTask untuk mengambil NIM dari endpoint pertama
     private class FetchNIMDataTask extends AsyncTask<Void, Void, String> {
 
         @Override
@@ -148,8 +153,6 @@ public class BerandaMahasiswaActivity extends AppCompatActivity {
 
                     if (jsonObject.has("nim")) {
                         String nim = jsonObject.getString("nim");
-
-                        // Setelah mendapatkan nim, lanjutkan dengan mengambil data mahasiswa berdasarkan nim
                         new FetchMahasiswaDataTask().execute(nim);
                     } else {
                         Log.e("FetchNIMDataTask", "NIM not found in response.");
@@ -159,13 +162,11 @@ public class BerandaMahasiswaActivity extends AppCompatActivity {
                     Log.e("FetchNIMDataTask", "JSON parsing error: " + e.getMessage());
                 }
             } else {
-                // Handle jika gagal mendapatkan data
                 Log.e("FetchNIMDataTask", "Failed to fetch data. Result is null.");
             }
         }
     }
 
-    // AsyncTask untuk mengambil data mahasiswa berdasarkan nim
     private class FetchMahasiswaDataTask extends AsyncTask<String, Void, String> {
 
         @Override
@@ -209,7 +210,11 @@ public class BerandaMahasiswaActivity extends AppCompatActivity {
                         String nim = jsonObject.getString("NIM");
                         int semester = jsonObject.getInt("Semester");
 
-                        // Tampilkan data di logcat
+                        // Update TextViews with fetched data
+                        namaUserTextView.setText(nama);
+                        nimTextView.setText(nim);
+                        semesterTextView.setText(String.valueOf("Semester "+ semester));
+
                         Log.d("FetchMahasiswaDataTask", "Nama: " + nama);
                         Log.d("FetchMahasiswaDataTask", "NIM: " + nim);
                         Log.d("FetchMahasiswaDataTask", "Semester: " + semester);
@@ -221,7 +226,6 @@ public class BerandaMahasiswaActivity extends AppCompatActivity {
                     Log.e("FetchMahasiswaDataTask", "JSON parsing error: " + e.getMessage());
                 }
             } else {
-                // Handle jika gagal mendapatkan data
                 Log.e("FetchMahasiswaDataTask", "Failed to fetch data. Result is null.");
             }
         }
