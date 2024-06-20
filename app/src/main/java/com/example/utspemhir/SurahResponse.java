@@ -50,7 +50,7 @@ public class SurahResponse {
         @SerializedName("lang")
         private String lang;
         @SerializedName("percent")
-        private int percent;
+        private double percent; // Ubah dari int ke double
         @SerializedName("surah_names")
         private List<String> surahNames;
 
@@ -63,12 +63,12 @@ public class SurahResponse {
             this.lang = lang;
         }
 
-        public int getPercent() {
-            return percent;
+        public double getPercent() {
+            return percent; // Ubah dari int ke double
         }
 
-        public void setPercent(int percent) {
-            this.percent = percent;
+        public void setPercent(double percent) {
+            this.percent = percent; // Ubah dari int ke double
         }
 
         public List<String> getSurahNames() {

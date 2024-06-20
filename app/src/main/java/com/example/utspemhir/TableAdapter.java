@@ -9,27 +9,25 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
 
 public class TableAdapter extends RecyclerView.Adapter<TableAdapter.TableViewHolder> {
-
     private List<TableRow> tableRows;
 
     public TableAdapter(List<TableRow> tableRows) {
         this.tableRows = tableRows;
     }
 
-    @NonNull
     @Override
-    public TableViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public TableViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.table_row, parent, false);
         return new TableViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull TableViewHolder holder, int position) {
+    public void onBindViewHolder(TableViewHolder holder, int position) {
         TableRow tableRow = tableRows.get(position);
-        holder.surah.setText(tableRow.getSurah());
-        holder.tanggal.setText(tableRow.getTanggal());
-        holder.persyaratan.setText(tableRow.getPersyaratan());
-        holder.parafPA.setText(tableRow.getParafPA());
+        holder.surahTextView.setText(tableRow.getSurah());
+        holder.tanggalTextView.setText(tableRow.getTanggal());
+        holder.persyaratanTextView.setText(tableRow.getPersyaratan());
+        holder.parafPATextView.setText(tableRow.getParafPA());
     }
 
     @Override
@@ -37,16 +35,18 @@ public class TableAdapter extends RecyclerView.Adapter<TableAdapter.TableViewHol
         return tableRows.size();
     }
 
-    static class TableViewHolder extends RecyclerView.ViewHolder {
+    public class TableViewHolder extends RecyclerView.ViewHolder {
+        TextView surahTextView;
+        TextView tanggalTextView;
+        TextView persyaratanTextView;
+        TextView parafPATextView;
 
-        TextView surah, tanggal, persyaratan, parafPA;
-
-        public TableViewHolder(@NonNull View itemView) {
+        public TableViewHolder(View itemView) {
             super(itemView);
-            surah = itemView.findViewById(R.id.tv_surah);
-            tanggal = itemView.findViewById(R.id.tv_tanggal);
-            persyaratan = itemView.findViewById(R.id.tv_persyaratan);
-            parafPA = itemView.findViewById(R.id.tv_paraf_pa);
+            surahTextView = itemView.findViewById(R.id.tv_surah);
+            tanggalTextView = itemView.findViewById(R.id.tv_tanggal);
+            persyaratanTextView = itemView.findViewById(R.id.tv_persyaratan);
+            parafPATextView = itemView.findViewById(R.id.tv_paraf_pa);
         }
     }
 }

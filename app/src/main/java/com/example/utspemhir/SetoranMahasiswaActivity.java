@@ -11,6 +11,7 @@ import android.graphics.Paint;
 import android.graphics.pdf.PdfDocument;
 import android.os.Bundle;
 import android.os.Environment;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -38,6 +39,7 @@ import retrofit2.Response;
 
 public class SetoranMahasiswaActivity extends AppCompatActivity {
 
+    private static final String TAG = "SetoranMahasiswaActivity";
     private static final int PERMISSION_REQUEST_CODE = 1;
     DrawerLayout drawerLayout;
     RecyclerView recyclerView;
@@ -78,6 +80,7 @@ public class SetoranMahasiswaActivity extends AppCompatActivity {
     private Bitmap getRecyclerViewScreenshot(RecyclerView view) {
         RecyclerView.Adapter adapter = view.getAdapter();
         if (adapter == null) {
+            Log.e(TAG, "Adapter is null");
             return null;
         }
 
@@ -154,9 +157,11 @@ public class SetoranMahasiswaActivity extends AppCompatActivity {
         try {
             document.writeTo(new FileOutputStream(filePath));
             Toast.makeText(this, "PDF Saved to " + filePath, Toast.LENGTH_LONG).show();
+            Log.d(TAG, "PDF saved successfully to " + filePath);
         } catch (IOException e) {
             e.printStackTrace();
             Toast.makeText(this, "Failed to save PDF", Toast.LENGTH_SHORT).show();
+            Log.e(TAG, "Failed to save PDF: " + e.getMessage());
         }
 
         document.close();
@@ -180,48 +185,70 @@ public class SetoranMahasiswaActivity extends AppCompatActivity {
                 saveBitmapAsPDF(recyclerViewScreenshot);
             } else {
                 Toast.makeText(this, "Permission Denied", Toast.LENGTH_SHORT).show();
+                Log.w(TAG, "Permission denied by user");
             }
         }
     }
 
     private void fetchSurahData() {
+        Log.d(TAG, "Fetching Surah data...");
         ApiService apiService = RetrofitClient.getClient("https://samatif.000webhostapp.com/").create(ApiService.class);
         apiService.getSurahDetails("122501").enqueue(new Callback<SurahResponse>() {
             @Override
             public void onResponse(Call<SurahResponse> call, Response<SurahResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     SurahResponse surahResponse = response.body();
-                    Map<String, String> surahDates = new HashMap<>();
-
-                    // Fetch setoran data to get dates
-                    apiService.getSetoranDetails("122501").enqueue(new Callback<SetoranResponse>() {
-                        @Override
-                        public void onResponse(Call<SetoranResponse> call, Response<SetoranResponse> response) {
-                            if (response.isSuccessful() && response.body() != null) {
-                                for (SetoranResponse.Setoran setoran : response.body().getSetoran()) {
-                                    surahDates.put(setoran.getNamaSurah(), setoran.getTanggal());
-                                }
-                                updateTableRows(surahResponse, surahDates);
-                            }
-                        }
-
-                        @Override
-                        public void onFailure(Call<SetoranResponse> call, Throwable t) {
-                            Toast.makeText(SetoranMahasiswaActivity.this, "Failed to fetch setoran data", Toast.LENGTH_SHORT).show();
-                        }
-                    });
+                    Log.d(TAG, "Surah data fetched successfully");
+                    fetchSetoranData(surahResponse);
+                } else {
+                    Toast.makeText(SetoranMahasiswaActivity.this, "Gagal mengambil data surah", Toast.LENGTH_SHORT).show();
+                    Log.e(TAG, "Failed to fetch Surah data: " + response.message());
                 }
             }
 
             @Override
             public void onFailure(Call<SurahResponse> call, Throwable t) {
-                Toast.makeText(SetoranMahasiswaActivity.this, "Failed to fetch surah data", Toast.LENGTH_SHORT).show();
+                Toast.makeText(SetoranMahasiswaActivity.this, "Gagal mengambil data surah: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                Log.e(TAG, "Error fetching Surah data: " + t.getMessage());
             }
         });
     }
 
-    private void updateTableRows(SurahResponse surahResponse, Map<String, String> surahDates) {
+    private void fetchSetoranData(SurahResponse surahResponse) {
+        Log.d(TAG, "Fetching Setoran data...");
+        ApiService apiService = RetrofitClient.getClient("https://samatif.000webhostapp.com/").create(ApiService.class);
+        apiService.getSetoranDetails("122501").enqueue(new Callback<SetoranResponse>() {
+            @Override
+            public void onResponse(Call<SetoranResponse> call, Response<SetoranResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    SetoranResponse setoranResponse = response.body();
+                    Log.d(TAG, "Setoran data fetched successfully");
+                    updateTableRows(surahResponse, setoranResponse);
+                } else {
+                    Toast.makeText(SetoranMahasiswaActivity.this, "Gagal mengambil data setoran", Toast.LENGTH_SHORT).show();
+                    Log.e(TAG, "Failed to fetch Setoran data: " + response.message());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<SetoranResponse> call, Throwable t) {
+                Toast.makeText(SetoranMahasiswaActivity.this, "Gagal mengambil data setoran: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                Log.e(TAG, "Error fetching Setoran data: " + t.getMessage());
+            }
+        });
+    }
+
+    private void updateTableRows(SurahResponse surahResponse, SetoranResponse setoranResponse) {
+        Log.d(TAG, "Updating table rows with fetched data");
         tableRows.clear();
+        Map<String, String> surahDates = new HashMap<>();
+
+        // Ambil data tanggal dari setoranResponse
+        for (SetoranResponse.Setoran setoran : setoranResponse.getSetoran()) {
+            surahDates.put(setoran.getNamaSurah(), setoran.getTanggal());
+        }
+
+        // Update baris tabel dengan data dari surahResponse dan setoranResponse
         for (SurahResponse.Percentage percentage : surahResponse.getPercentages()) {
             for (String surahName : percentage.getSurahNames()) {
                 String date = surahDates.getOrDefault(surahName, "");
@@ -229,6 +256,7 @@ public class SetoranMahasiswaActivity extends AppCompatActivity {
             }
         }
         tableAdapter.notifyDataSetChanged();
+        Log.d(TAG, "Table rows updated successfully");
     }
 
     public void ClickMenu(View view) {
