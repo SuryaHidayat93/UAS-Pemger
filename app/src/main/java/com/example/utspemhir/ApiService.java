@@ -29,6 +29,11 @@ public interface ApiService {
             @Field("tajwid") String tajwid,
             @Field("makhrajul_huruf") String makhrajulHuruf
     );
+    @GET("index.php") // Sesuaikan dengan path endpoint yang benar
+    Call<NIMResponse> getNIM(
+            @Query("action") String action,
+            @Query("token") String token
+    );
 
     @GET("setoran/sudahbelum.php")
     Call<SurahResponse> getSurahDetails(@Query("nim") String nim);

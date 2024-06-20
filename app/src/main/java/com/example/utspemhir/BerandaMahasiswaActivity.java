@@ -153,6 +153,13 @@ public class BerandaMahasiswaActivity extends AppCompatActivity {
 
                     if (jsonObject.has("nim")) {
                         String nim = jsonObject.getString("nim");
+
+                        // Simpan NIM ke SharedPreferences
+                        SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
+                        SharedPreferences.Editor editor = sharedPreferences.edit();
+                        editor.putString("nim", nim);
+                        editor.apply();
+
                         new FetchMahasiswaDataTask().execute(nim);
                     } else {
                         Log.e("FetchNIMDataTask", "NIM not found in response.");
@@ -213,7 +220,7 @@ public class BerandaMahasiswaActivity extends AppCompatActivity {
                         // Update TextViews with fetched data
                         namaUserTextView.setText(nama);
                         nimTextView.setText(nim);
-                        semesterTextView.setText(String.valueOf("Semester "+ semester));
+                        semesterTextView.setText("Semester " + semester);
 
                         Log.d("FetchMahasiswaDataTask", "Nama: " + nama);
                         Log.d("FetchMahasiswaDataTask", "NIM: " + nim);

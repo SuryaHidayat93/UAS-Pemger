@@ -2,8 +2,10 @@ package com.example.utspemhir;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -61,20 +63,38 @@ public class SetoranMahasiswaActivity extends AppCompatActivity {
         tableAdapter = new TableAdapter(tableRows);
         recyclerView.setAdapter(tableAdapter);
 
-        fetchSurahData();
+        // Mendapatkan token dari SharedPreferences
+        SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        String token = sharedPreferences.getString("jwt_token", "");
+        String nim = sharedPreferences.getString("nim", "");
 
-        // Set download button click listener
-        downloadButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (checkPermission()) {
-                    Bitmap recyclerViewScreenshot = getRecyclerViewScreenshot(recyclerView);
-                    saveBitmapAsPDF(recyclerViewScreenshot);
-                } else {
-                    requestPermission();
+        if (token.isEmpty()) {
+            Log.w(TAG, "Token is empty or not available in SharedPreferences");
+            // Lakukan sesuatu jika token kosong, misalnya kembali ke halaman login
+            // atau tampilkan pesan kepada pengguna bahwa mereka perlu login kembali.
+        } else if (nim.isEmpty()) {
+            Log.w(TAG, "NIM is empty or not available in SharedPreferences");
+            // Lakukan sesuatu jika NIM kosong, misalnya kembali ke halaman login
+            // atau tampilkan pesan kepada pengguna bahwa mereka perlu login kembali.
+        } else {
+            Log.d(TAG, "Token from SharedPreferences: " + token);
+            Log.d(TAG, "NIM from SharedPreferences: " + nim);
+            // Setelah mendapatkan NIM, lakukan fetchSurahData
+            fetchSurahData(nim);
+
+            // Set download button click listener
+            downloadButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (checkPermission()) {
+                        Bitmap recyclerViewScreenshot = getRecyclerViewScreenshot(recyclerView);
+                        saveBitmapAsPDF(recyclerViewScreenshot);
+                    } else {
+                        requestPermission();
+                    }
                 }
-            }
-        });
+            });
+        }
     }
 
     private Bitmap getRecyclerViewScreenshot(RecyclerView view) {
@@ -139,7 +159,6 @@ public class SetoranMahasiswaActivity extends AppCompatActivity {
         return bigBitmap;
     }
 
-
     private void saveBitmapAsPDF(Bitmap bitmap) {
         PdfDocument document = new PdfDocument();
         PdfDocument.PageInfo pageInfo = new PdfDocument.PageInfo.Builder(bitmap.getWidth(), bitmap.getHeight(), 1).create();
@@ -176,24 +195,11 @@ public class SetoranMahasiswaActivity extends AppCompatActivity {
         ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSION_REQUEST_CODE);
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == PERMISSION_REQUEST_CODE) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Bitmap recyclerViewScreenshot = getRecyclerViewScreenshot(recyclerView);
-                saveBitmapAsPDF(recyclerViewScreenshot);
-            } else {
-                Toast.makeText(this, "Permission Denied", Toast.LENGTH_SHORT).show();
-                Log.w(TAG, "Permission denied by user");
-            }
-        }
-    }
-
-    private void fetchSurahData() {
+    private void fetchSurahData(String nim) {
         Log.d(TAG, "Fetching Surah data...");
+        // Lakukan sesuatu dengan NIM, misalnya pass ke API untuk fetch data Surah
         ApiService apiService = RetrofitClient.getClient("https://samatif.000webhostapp.com/").create(ApiService.class);
-        apiService.getSurahDetails("122501").enqueue(new Callback<SurahResponse>() {
+        apiService.getSurahDetails(nim).enqueue(new Callback<SurahResponse>() {
             @Override
             public void onResponse(Call<SurahResponse> call, Response<SurahResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
@@ -201,8 +207,18 @@ public class SetoranMahasiswaActivity extends AppCompatActivity {
                     Log.d(TAG, "Surah data fetched successfully");
                     fetchSetoranData(surahResponse);
                 } else {
+                    String errorMessage = "Failed to fetch Surah data: ";
+                    if (response.errorBody() != null) {
+                        try {
+                            errorMessage += response.errorBody().string();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+                        errorMessage += "Response body is null";
+                    }
                     Toast.makeText(SetoranMahasiswaActivity.this, "Gagal mengambil data surah", Toast.LENGTH_SHORT).show();
-                    Log.e(TAG, "Failed to fetch Surah data: " + response.message());
+                    Log.e(TAG, errorMessage);
                 }
             }
 
@@ -216,8 +232,12 @@ public class SetoranMahasiswaActivity extends AppCompatActivity {
 
     private void fetchSetoranData(SurahResponse surahResponse) {
         Log.d(TAG, "Fetching Setoran data...");
+        // Ambil NIM dari SharedPreferences
+        SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        String nim = sharedPreferences.getString("nim", "");
+
         ApiService apiService = RetrofitClient.getClient("https://samatif.000webhostapp.com/").create(ApiService.class);
-        apiService.getSetoranDetails("122501").enqueue(new Callback<SetoranResponse>() {
+        apiService.getSetoranDetails(nim).enqueue(new Callback<SetoranResponse>() {
             @Override
             public void onResponse(Call<SetoranResponse> call, Response<SetoranResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
@@ -225,8 +245,18 @@ public class SetoranMahasiswaActivity extends AppCompatActivity {
                     Log.d(TAG, "Setoran data fetched successfully");
                     updateTableRows(surahResponse, setoranResponse);
                 } else {
+                    String errorMessage = "Failed to fetch Setoran data: ";
+                    if (response.errorBody() != null) {
+                        try {
+                            errorMessage += response.errorBody().string();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+                        errorMessage += "Response body is null";
+                    }
                     Toast.makeText(SetoranMahasiswaActivity.this, "Gagal mengambil data setoran", Toast.LENGTH_SHORT).show();
-                    Log.e(TAG, "Failed to fetch Setoran data: " + response.message());
+                    Log.e(TAG, errorMessage);
                 }
             }
 
