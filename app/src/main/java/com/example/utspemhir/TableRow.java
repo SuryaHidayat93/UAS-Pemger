@@ -17,15 +17,31 @@ public class TableRow {
         return surah;
     }
 
+    public void setSurah(String surah) {
+        this.surah = surah;
+    }
+
     public String getTanggal() {
         return tanggal;
+    }
+
+    public void setTanggal(String tanggal) {
+        this.tanggal = tanggal;
     }
 
     public String getPersyaratan() {
         return persyaratan;
     }
 
+    public void setPersyaratan(String persyaratan) {
+        this.persyaratan = persyaratan;
+    }
+
     public String getParafPA() {
         return parafPA;
+    }
+
+    public void setParafPA(String parafPA) {
+        this.parafPA = parafPA;
     }
 }

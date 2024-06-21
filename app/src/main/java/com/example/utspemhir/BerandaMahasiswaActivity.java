@@ -15,6 +15,7 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -118,7 +119,7 @@ public class BerandaMahasiswaActivity extends AppCompatActivity {
 
         @Override
         protected String doInBackground(Void... voids) {
-            String urlString = "https://samatif.000webhostapp.com/index.php?action=get";
+            String urlString = "https://samatif-ml.preview-domain.com/login.php?action=get";
             try {
                 URL url = new URL(urlString);
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -179,7 +180,7 @@ public class BerandaMahasiswaActivity extends AppCompatActivity {
         @Override
         protected String doInBackground(String... params) {
             String nim = params[0];
-            String urlString = "https://samatif.000webhostapp.com/mahasiswa/by-nim.php?nim=" + nim;
+            String urlString = "https://samatif-ml.preview-domain.com/mahasiswa/by-nim.php?nim=" + nim;
             try {
                 URL url = new URL(urlString);
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -210,23 +211,30 @@ public class BerandaMahasiswaActivity extends AppCompatActivity {
             if (result != null) {
                 Log.d("FetchMahasiswaDataTask", "Response: " + result);
                 try {
-                    JSONObject jsonObject = new JSONObject(result);
+                    // Parse the result as a JSON array
+                    JSONArray jsonArray = new JSONArray(result);
 
-                    if (jsonObject.has("Nama") && jsonObject.has("NIM") && jsonObject.has("Semester")) {
-                        String nama = jsonObject.getString("Nama");
-                        String nim = jsonObject.getString("NIM");
-                        int semester = jsonObject.getInt("Semester");
+                    if (jsonArray.length() > 0) {
+                        JSONObject jsonObject = jsonArray.getJSONObject(0);
 
-                        // Update TextViews with fetched data
-                        namaUserTextView.setText(nama);
-                        nimTextView.setText(nim);
-                        semesterTextView.setText("Semester " + semester);
+                        if (jsonObject.has("Nama") && jsonObject.has("NIM") && jsonObject.has("Semester")) {
+                            String nama = jsonObject.getString("Nama");
+                            String nim = jsonObject.getString("NIM");
+                            int semester = jsonObject.getInt("Semester");
 
-                        Log.d("FetchMahasiswaDataTask", "Nama: " + nama);
-                        Log.d("FetchMahasiswaDataTask", "NIM: " + nim);
-                        Log.d("FetchMahasiswaDataTask", "Semester: " + semester);
+                            // Update TextViews with fetched data
+                            namaUserTextView.setText(nama);
+                            nimTextView.setText(nim);
+                            semesterTextView.setText("Semester " + semester);
+
+                            Log.d("FetchMahasiswaDataTask", "Nama: " + nama);
+                            Log.d("FetchMahasiswaDataTask", "NIM: " + nim);
+                            Log.d("FetchMahasiswaDataTask", "Semester: " + semester);
+                        } else {
+                            Log.e("FetchMahasiswaDataTask", "Required fields are missing in the response.");
+                        }
                     } else {
-                        Log.e("FetchMahasiswaDataTask", "Required fields are missing in the response.");
+                        Log.e("FetchMahasiswaDataTask", "Empty array in response.");
                     }
 
                 } catch (JSONException e) {

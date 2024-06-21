@@ -1,12 +1,15 @@
 package com.example.utspemhir;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -33,23 +36,32 @@ public class RiwayatMahasiswaActivity extends AppCompatActivity {
     RecyclerView recyclerView;
     CustomAdapter adapter;
     List<DataModel> dataModelList;
+    TextView namaUserTextView;
+    TextView nimTextView;
+    TextView semesterTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_riwayatmahasiswadosen);
+        setContentView(R.layout.activity_riwayatmahasiswa);
 
-        String nama = getIntent().getStringExtra("nama");
-        String nim = getIntent().getStringExtra("nim");
 
-        if (nim != null && nim.startsWith("Nim: ")) {
-            nim = nim.substring(5); // Menghapus "Nim: " dari awal string
-        }
+        SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        String nim = sharedPreferences.getString("nim", "");
+
+        new FetchMahasiswaDataTask().execute(nim);
+
+        View sidebarView = findViewById(R.id.sidebarmahasiswa);
+        namaUserTextView = sidebarView.findViewById(R.id.namamahasiswa);
+        nimTextView = sidebarView.findViewById(R.id.nim);
+        semesterTextView = sidebarView.findViewById(R.id.semester);
 
         Log.d("RiwayatMahasiswaDosen", "Received NIM:" + nim);
 
         drawerLayout = findViewById(R.id.drawer_layer);
         recyclerView = findViewById(R.id.recyclerView);
+
+
 
         // Set up RecyclerView
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -81,17 +93,17 @@ public class RiwayatMahasiswaActivity extends AppCompatActivity {
     }
 
     public void beranda(View view) {
-        Intent intent = new Intent(RiwayatMahasiswaActivity.this, BerandaDosenActivity.class);
+        Intent intent = new Intent(RiwayatMahasiswaActivity.this, BerandaMahasiswaActivity.class);
         startActivity(intent);
     }
 
     public void setoran(View view) {
-        Intent intent = new Intent(RiwayatMahasiswaActivity.this, SetoranDosenActivity.class);
+        Intent intent = new Intent(RiwayatMahasiswaActivity.this, SetoranMahasiswaActivity.class);
         startActivity(intent);
     }
 
     public void riwayat(View view) {
-        Intent intent = new Intent(RiwayatMahasiswaActivity.this, RiwayatDosenActivity.class);
+        Intent intent = new Intent(RiwayatMahasiswaActivity.this, RiwayatMahasiswaActivity.class);
         startActivity(intent);
     }
 
@@ -106,6 +118,11 @@ public class RiwayatMahasiswaActivity extends AppCompatActivity {
         builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
+                SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.clear();
+                editor.apply();
+
                 Intent intent = new Intent(RiwayatMahasiswaActivity.this, LoginActivity.class);
                 startActivity(intent);
                 finish();
@@ -125,7 +142,7 @@ public class RiwayatMahasiswaActivity extends AppCompatActivity {
         @Override
         protected String doInBackground(String... params) {
             String nim = params[0];
-            String urlString = "https://samatif.000webhostapp.com/setoran/by-nim.php?nim=122501";
+            String urlString = "https://samatif-ml.preview-domain.com/setoran/by-nim.php?nim=122501";
             try {
                 URL url = new URL(urlString);
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -184,4 +201,63 @@ public class RiwayatMahasiswaActivity extends AppCompatActivity {
             }
         }
     }
+
+    private class FetchMahasiswaDataTask extends AsyncTask<String, Void, String> {
+
+        @Override
+        protected String doInBackground(String... params) {
+            String nim = params[0];
+            String urlString = "https://samatif-ml.preview-domain.com/mahasiswa/by-nim.php?nim=" + nim;
+            try {
+                URL url = new URL(urlString);
+                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                connection.setRequestMethod("GET");
+
+                int responseCode = connection.getResponseCode();
+                if (responseCode == HttpURLConnection.HTTP_OK) {
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                    StringBuilder response = new StringBuilder();
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        response.append(line);
+                    }
+                    reader.close();
+                    return response.toString();
+                } else {
+                    Log.e("FetchMahasiswaDataTask", "Failed to fetch data. Response code: " + responseCode);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            if (result != null) {
+                try {
+                    JSONArray jsonArray = new JSONArray(result); // Parse as JSONArray
+
+                    // Assuming you only need the first object if multiple are returned
+                    JSONObject jsonObject = jsonArray.getJSONObject(0); // Get the first object
+
+                    String nama = jsonObject.getString("Nama"); // "Nama" is the key based on your example response
+                    String nim = jsonObject.getString("NIM");
+                    String semester = jsonObject.getString("Semester");
+
+                    // Set TextViews with retrieved data
+                    namaUserTextView.setText(nama);
+                    nimTextView.setText(nim);
+                    semesterTextView.setText("semester: "+semester);
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                Log.e("FetchMahasiswaDataTask", "Failed to fetch data.");
+            }
+        }
+    }
+
+
 }

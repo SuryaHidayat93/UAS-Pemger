@@ -41,7 +41,7 @@
         android:layout_height="match_parent"
         android:layout_gravity="start">
 
-        <include layout="@layout/sidebardosen" />
+        <include layout="@layout/sidebarmahasiswa" />
     </RelativeLayout>
 
     <!-- Other views like Navigation Drawer -->

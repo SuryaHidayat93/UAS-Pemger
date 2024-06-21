@@ -1,6 +1,8 @@
 package com.example.utspemhir;
 
 import android.animation.ObjectAnimator;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.widget.ProgressBar;
@@ -28,6 +30,8 @@ public class ActivityProgress extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_progress);
 
+        SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        String nim = sharedPreferences.getString("nim", "");
         progressBar1 = findViewById(R.id.progressBar1);
         progressBar2 = findViewById(R.id.progressBar2);
         progressBar3 = findViewById(R.id.progressBar3);
@@ -41,7 +45,7 @@ public class ActivityProgress extends AppCompatActivity {
         percentage5 = findViewById(R.id.percentage5);
 
         // Dapatkan NIM dari Intent
-        String nim = getIntent().getStringExtra("nim");
+
 
         // Jalankan AsyncTask untuk mengambil data dari API
         new FetchProgressData().execute(nim);
@@ -52,7 +56,7 @@ public class ActivityProgress extends AppCompatActivity {
         @Override
         protected String doInBackground(String... params) {
             String nim = params[0];
-            String urlString = "https://samatif.000webhostapp.com/setoran/sudahbelum.php?nim=122501" + nim;
+            String urlString = "https://samatif-ml.preview-domain.com/setoran/sudahbelum.php?nim=" + nim;
             try {
                 URL url = new URL(urlString);
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();

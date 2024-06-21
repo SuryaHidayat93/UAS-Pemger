@@ -59,7 +59,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         protected String doInBackground(String... params) {
             String username = params[0];
             String password = params[1];
-            String urlString = "https://ghostwhite-hummingbird-779835.hostingersite.com/index.php?action=login"; // Ubah endpoint sesuai kebutuhan
+            String urlString = "https://samatif-ml.preview-domain.com/login.php?action=login"; // Ubah endpoint sesuai kebutuhan
 
             try {
                 URL url = new URL(urlString);
