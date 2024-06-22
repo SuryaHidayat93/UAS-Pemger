@@ -57,7 +57,7 @@ public class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             holder.textViewTajwid.setText(data.getTajwid());
             holder.textViewMakhrajulHuruf.setText(data.getMakhrajulHuruf());
 
-            holder.itemView.setOnClickListener(v -> showDeleteDialog(data, position));
+
         }
     }
 
@@ -71,17 +71,7 @@ public class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         return position == 0 ? VIEW_TYPE_HEADER : VIEW_TYPE_ITEM;
     }
 
-    private void showDeleteDialog(DataModel data, int position) {
-        new AlertDialog.Builder(context)
-                .setTitle("Hapus Setoran")
-                .setMessage("Apakah Anda yakin ingin menghapus surah ini?")
-                .setPositiveButton("Hapus", (dialog, which) -> {
-                    // Handle the deletion here
-                    new DeleteSetoranTask(data.getIdSetoran(), position).execute();
-                })
-                .setNegativeButton("Batal", null)
-                .show();
-    }
+
 
     private class DeleteSetoranTask extends AsyncTask<Void, Void, Boolean> {
         private int idSetoran;

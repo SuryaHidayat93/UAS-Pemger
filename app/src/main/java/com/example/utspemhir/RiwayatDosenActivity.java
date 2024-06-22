@@ -16,6 +16,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -46,11 +47,32 @@ public class RiwayatDosenActivity extends AppCompatActivity implements MyAdapter
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
 
-        // Inisialisasi Spinner
+        // Initialize Spinner
         initializeSpinner();
 
-        // Ambil data dari endpoint
+        // Fetch data from endpoint
         fetchDataFromEndpoint();
+
+        // Display nama and nip from SharedPreferences
+        displayNamaAndNip();
+    }
+
+    private void displayNamaAndNip() {
+        SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        String nama = sharedPreferences.getString("nama", "");
+        String nip = sharedPreferences.getString("nip", "");
+
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                View sidebarView = findViewById(R.id.sidebardosen);
+                TextView namaDosenTextView = sidebarView.findViewById(R.id.namadosen);
+                TextView nipTextView = sidebarView.findViewById(R.id.nip);
+
+                namaDosenTextView.setText(nama);
+                nipTextView.setText(nip);
+            }
+        });
     }
 
     private void initializeSpinner() {
@@ -68,22 +90,28 @@ public class RiwayatDosenActivity extends AppCompatActivity implements MyAdapter
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-                // Tidak ada yang dipilih
+                // Nothing selected
             }
         });
     }
 
     private void fetchDataFromEndpoint() {
         SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
-        String token = sharedPreferences.getString("token", ""); // Ambil token dari SharedPreferences
+        String token = sharedPreferences.getString("jwt_token", ""); // Get token from SharedPreferences
+        String nip = sharedPreferences.getString("nip", ""); // Get nip from SharedPreferences
 
         if (token.isEmpty()) {
             Toast.makeText(this, "Token tidak ditemukan", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        ApiService apiService = RetrofitClient.getClient("https://samatif-ml.preview-domain.com/", token).create(ApiService.class);
-        Call<DosenResponse> call = apiService.getDosenByNip("19981");
+        if (nip.isEmpty()) {
+            Toast.makeText(this, "NIP tidak ditemukan", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        ApiService apiService = RetrofitClient.getClient("https://samatif.xyz/", token).create(ApiService.class);
+        Call<DosenResponse> call = apiService.getDosenByNip(nip);
 
         call.enqueue(new Callback<DosenResponse>() {
             @Override
@@ -129,7 +157,7 @@ public class RiwayatDosenActivity extends AppCompatActivity implements MyAdapter
     }
 
     public void riwayat(View view) {
-        // Tidak ada tindakan karena Anda sudah berada di RiwayatDosenActivity
+        // Do nothing as you are already in RiwayatDosenActivity
     }
 
     public void logout(View view) {

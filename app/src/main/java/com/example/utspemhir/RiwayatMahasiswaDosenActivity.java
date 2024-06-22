@@ -1,12 +1,16 @@
 package com.example.utspemhir;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -33,17 +37,34 @@ public class RiwayatMahasiswaDosenActivity extends AppCompatActivity {
     RecyclerView recyclerView;
     CustomAdapter adapter;
     List<DataModel> dataModelList;
+    TextView namaDosenTextView, nipTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_riwayatmahasiswadosen);
 
-        String nama = getIntent().getStringExtra("nama");
-        String nim = getIntent().getStringExtra("nim");
+        SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        String nama = sharedPreferences.getString("nama", ""); // Retrieve nama from SharedPreferences
+        String nip = sharedPreferences.getString("nip", "");   // Retrieve nip from SharedPreferences
 
+        // Update UI elements with nama and nip
+
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                View sidebarView = findViewById(R.id.sidebardosen);
+                TextView namaDosenTextView = sidebarView.findViewById(R.id.namadosen);
+                TextView nipTextView = sidebarView.findViewById(R.id.nip);
+
+                namaDosenTextView.setText(nama);
+                nipTextView.setText(nip);
+            }
+        });
+
+        String nim = getIntent().getStringExtra("nim");
         if (nim != null && nim.startsWith("Nim: ")) {
-            nim = nim.substring(5); // Menghapus "Nim: " dari awal string
+            nim = nim.substring(5); // Remove "Nim: " from the beginning of the string
         }
 
         Log.d("RiwayatMahasiswaDosen", "Received NIM:" + nim);
@@ -66,7 +87,7 @@ public class RiwayatMahasiswaDosenActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(RiwayatMahasiswaDosenActivity.this, ActivityProgress.class);
-                intent.putExtra("nim", finalNim);  // Mengirimkan NIM ke ActivityProgress
+                intent.putExtra("nim", finalNim);  // Send NIM to ActivityProgress
                 startActivity(intent);
             }
         });
@@ -125,11 +146,19 @@ public class RiwayatMahasiswaDosenActivity extends AppCompatActivity {
         @Override
         protected String doInBackground(String... params) {
             String nim = params[0];
-            String urlString = "https://samatif.000webhostapp.com/setoran/by-nim.php?nim=" + nim;
+            String urlString = "https://samatif.xyz/setoran/by-nim.php?nim=" + nim;
+
+            SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+            String token = sharedPreferences.getString("jwt_token", "");
+
             try {
                 URL url = new URL(urlString);
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                 connection.setRequestMethod("GET");
+
+                // Add token to the request header
+                connection.setRequestProperty("Authorization", "Bearer " + token);
+
                 int responseCode = connection.getResponseCode();
 
                 if (responseCode == 200) {
@@ -181,6 +210,7 @@ public class RiwayatMahasiswaDosenActivity extends AppCompatActivity {
                 }
             } else {
                 // Handle the error
+                Toast.makeText(RiwayatMahasiswaDosenActivity.this, "Gagal mengambil data setoran", Toast.LENGTH_SHORT).show();
             }
         }
     }

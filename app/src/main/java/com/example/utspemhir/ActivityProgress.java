@@ -2,6 +2,7 @@ package com.example.utspemhir;
 
 import android.animation.ObjectAnimator;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -30,8 +31,22 @@ public class ActivityProgress extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_progress);
 
+        // Retrieve the nim from intent or SharedPreferences
+        Intent intent = getIntent();
+        String nim = intent.getStringExtra("nim");
+
+        if (nim == null) {
+            SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+            nim = sharedPreferences.getString("nim", "");
+        } else {
+            // Save the nim in SharedPreferences for future use
+            SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putString("nim", nim);
+            editor.apply();
+        }
+
         SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
-        String nim = sharedPreferences.getString("nim", "");
         String token = sharedPreferences.getString("jwt_token", "");
 
         progressBar1 = findViewById(R.id.progressBar1);
@@ -46,7 +61,7 @@ public class ActivityProgress extends AppCompatActivity {
         percentage4 = findViewById(R.id.percentage4);
         percentage5 = findViewById(R.id.percentage5);
 
-        // Jalankan AsyncTask untuk mengambil data dari API
+        // Run AsyncTask to fetch data from API
         new FetchProgressData().execute(nim, token);
     }
 

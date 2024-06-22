@@ -18,8 +18,6 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.utspemhir.MyAdapter;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -58,6 +56,19 @@ public class SetoranDosenActivity extends AppCompatActivity implements MyAdapter
 
         // Inisialisasi Spinner
         initializeSpinner();
+
+        // Ambil data dari SharedPreferences dan set ke TextView
+        SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        String nama = sharedPreferences.getString("nama", ""); // Ambil nama dari SharedPreferences
+        String nip = sharedPreferences.getString("nip", ""); // Ambil nip dari SharedPreferences
+
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                namaDosenTextView.setText(nama);
+                nipTextView.setText(nip);
+            }
+        });
 
         // Ambil data dari endpoint
         fetchDataFromEndpoint();
@@ -120,7 +131,6 @@ public class SetoranDosenActivity extends AppCompatActivity implements MyAdapter
             }
         });
     }
-
 
     public void ClickMenu(View view) {
         openDrawer(drawerLayout);

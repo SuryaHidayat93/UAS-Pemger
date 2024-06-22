@@ -40,19 +40,21 @@ public class InputSetoranActivity extends AppCompatActivity {
     private Button dateButton;
     private List<Surah> surahList;
     private String token;
-    private String nip;  // Tambahkan variabel nip
+    private String nip;
+    private String nama;  // Tambahkan variabel nama
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_inputsetoran);
 
-        // Ambil token dari SharedPreferences
+        // Ambil token dan data pengguna dari SharedPreferences
         SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
         token = sharedPreferences.getString("jwt_token", "");
         nip = sharedPreferences.getString("nip", "");  // Ambil nip dari SharedPreferences
+        nama = sharedPreferences.getString("nama", "");  // Ambil nama dari SharedPreferences
 
-        String nama = getIntent().getStringExtra("nama");
+        String namaMahasiswa = getIntent().getStringExtra("nama");
         String nim = getIntent().getStringExtra("nim");
 
         TextView namaTextView = findViewById(R.id.nama);
@@ -63,7 +65,7 @@ public class InputSetoranActivity extends AppCompatActivity {
         autoCompleteTxt4 = findViewById(R.id.auto_complete_txt4);
         dateButton = findViewById(R.id.datePickerButton);
 
-        namaTextView.setText(nama);
+        namaTextView.setText(namaMahasiswa);
         nimTextView.setText(nim);
 
         drawerLayout = findViewById(R.id.drawer_layer);
@@ -104,6 +106,19 @@ public class InputSetoranActivity extends AppCompatActivity {
 
         initDatePicker();
         dateButton.setText(getTodaysDate());
+
+        // Set nama and nip to TextViews in the sidebar
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                View sidebarView = findViewById(R.id.sidebardosen);
+                TextView namaDosenTextView = sidebarView.findViewById(R.id.namadosen);
+                TextView nipTextView = sidebarView.findViewById(R.id.nip);
+
+                namaDosenTextView.setText(nama);
+                nipTextView.setText(nip);
+            }
+        });
     }
 
     private void fetchSurahData() {
