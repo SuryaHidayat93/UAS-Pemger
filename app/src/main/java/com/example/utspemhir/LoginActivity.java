@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.json.JSONObject;
@@ -29,6 +30,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     EditText username;
     EditText password;
     Button loginButton;
+    TextView forgotPasswordTextView; // Add this line
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,8 +40,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         username = findViewById(R.id.username);
         password = findViewById(R.id.password);
         loginButton = findViewById(R.id.loginButton);
+        forgotPasswordTextView = findViewById(R.id.forgotPasswordTextView); // Add this line
 
         loginButton.setOnClickListener(this);
+        forgotPasswordTextView.setOnClickListener(this); // Add this line
     }
 
     @Override
@@ -50,6 +54,9 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
             // Lakukan login
             new LoginTask().execute(inputUsername, inputPassword);
+        } else if (v.getId() == R.id.forgotPasswordTextView) { // Add this block
+            Intent intent = new Intent(LoginActivity.this, LupaPasswordActivity.class);
+            startActivity(intent);
         }
     }
 
@@ -125,7 +132,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                         // Setelah berhasil login, ambil data dari endpoint 'get'
                         getData(token);
                     } else {
-                        Toast.makeText(LoginActivity.this, "Response tidak valid", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(LoginActivity.this, "Password atau Username salah", Toast.LENGTH_SHORT).show();
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -224,6 +231,4 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             }
         }
     }
-
-
 }
