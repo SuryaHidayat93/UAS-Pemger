@@ -32,6 +32,8 @@ public class ActivityProgress extends AppCompatActivity {
 
         SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
         String nim = sharedPreferences.getString("nim", "");
+        String token = sharedPreferences.getString("jwt_token", "");
+
         progressBar1 = findViewById(R.id.progressBar1);
         progressBar2 = findViewById(R.id.progressBar2);
         progressBar3 = findViewById(R.id.progressBar3);
@@ -44,11 +46,8 @@ public class ActivityProgress extends AppCompatActivity {
         percentage4 = findViewById(R.id.percentage4);
         percentage5 = findViewById(R.id.percentage5);
 
-        // Dapatkan NIM dari Intent
-
-
         // Jalankan AsyncTask untuk mengambil data dari API
-        new FetchProgressData().execute(nim);
+        new FetchProgressData().execute(nim, token);
     }
 
     private class FetchProgressData extends AsyncTask<String, Void, String> {
@@ -56,11 +55,15 @@ public class ActivityProgress extends AppCompatActivity {
         @Override
         protected String doInBackground(String... params) {
             String nim = params[0];
-            String urlString = "https://samatif-ml.preview-domain.com/setoran/sudahbelum.php?nim=" + nim;
+            String token = params[1];
+            String urlString = "https://samatif.xyz/setoran/sudahbelum.php?nim=" + nim;
+
             try {
                 URL url = new URL(urlString);
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                 connection.setRequestMethod("GET");
+                connection.setRequestProperty("Authorization", "Bearer " + token);
+
                 int responseCode = connection.getResponseCode();
 
                 if (responseCode == 200) {

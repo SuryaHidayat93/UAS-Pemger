@@ -5,7 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#1e293b"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:id="@+id/sidebardosen">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -33,18 +34,31 @@
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="6">
+            android:layout_weight="6"
+            android:orientation="vertical">
 
             <TextView
-                android:id="@+id/namauser"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:id="@+id/namadosen"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="60dp"
                 android:gravity="center_vertical"
-                android:text="Siti Ramadhani  130517045"
+                android:text="Farras Lathief "
                 android:paddingLeft="10dp"
-                android:textColor="@color/white"
-                android:textSize="20dp"
+                android:textColor="@android:color/white"
+                android:textSize="20sp"
                 android:textStyle="bold"/>
+
+            <TextView
+                android:id="@+id/nip"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:textSize="20sp"
+                android:text="nim"
+                android:textColor="@android:color/white"/>
+
+
         </LinearLayout>
 
         <LinearLayout

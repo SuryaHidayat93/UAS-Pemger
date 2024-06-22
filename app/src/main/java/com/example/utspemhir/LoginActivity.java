@@ -59,7 +59,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         protected String doInBackground(String... params) {
             String username = params[0];
             String password = params[1];
-            String urlString = "https://samatif-ml.preview-domain.com/login.php?action=login"; // Ubah endpoint sesuai kebutuhan
+            String urlString = "https://samatif.xyz/login.php?action=login"; // Ubah endpoint sesuai kebutuhan
 
             try {
                 URL url = new URL(urlString);
@@ -156,7 +156,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         @Override
         protected String doInBackground(String... params) {
             String token = params[0];
-            String urlString = "https://samatif.000webhostapp.com/index.php?action=get"; // Ubah endpoint sesuai kebutuhan
+            String urlString = "https://samatif.xyz/login.php?action=get"; // Ubah endpoint sesuai kebutuhan
 
             try {
                 URL url = new URL(urlString);

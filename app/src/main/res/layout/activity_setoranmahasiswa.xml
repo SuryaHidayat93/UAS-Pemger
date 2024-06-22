@@ -21,7 +21,8 @@
             android:drawableRight="@drawable/baseline_download_24"
             android:drawablePadding="8dp"
             android:gravity="center_vertical|start"
-            android:text="Download" />
+            android:text="Download"
+            android:onClick="downloadScreenshot"/>
 
         <!-- Table Header -->
         <include layout="@layout/table_header" />

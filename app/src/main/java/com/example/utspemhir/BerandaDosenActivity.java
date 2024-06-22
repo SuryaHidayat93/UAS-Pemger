@@ -7,14 +7,27 @@ import androidx.drawerlayout.widget.DrawerLayout;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
+
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 public class BerandaDosenActivity extends AppCompatActivity {
 
     DrawerLayout drawerLayout;
     TextView namaUserTextView;
+    TextView namaDosenTextView;
+    TextView nipTextView;
+    private SharedPreferences sharedPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,18 +35,15 @@ public class BerandaDosenActivity extends AppCompatActivity {
         setContentView(R.layout.activity_berandadosen);
 
         drawerLayout = findViewById(R.id.drawer_layer);
+        sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
 
-        // Mengakses TextView dari sidebardosen.xml
-        View sidebarView = findViewById(R.id.namauser);  // Pastikan ID ini sesuai dengan layout sidebardosen.xml
-        namaUserTextView = sidebarView.findViewById(R.id.namauser);
+        View sidebarView = findViewById(R.id.sidebardosen);
+        namaDosenTextView = sidebarView.findViewById(R.id.namadosen);
+        nipTextView = sidebarView.findViewById(R.id.nip);
 
-        // Get the username from the intent
-        Intent intent = getIntent();
-        String username = intent.getStringExtra("USERNAME");
-
-        // Set the username to the TextView
-        if (username != null) {
-            namaUserTextView.setText(username);
+        String token = sharedPreferences.getString("jwt_token", "");
+        if (!token.isEmpty()) {
+            fetchUserData(token);
         }
     }
 
@@ -71,10 +81,8 @@ public class BerandaDosenActivity extends AppCompatActivity {
         builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                // Start LoginActivity
                 Intent intent = new Intent(BerandaDosenActivity.this, LoginActivity.class);
                 startActivity(intent);
-                // Finish current activity
                 finish();
             }
         });
@@ -85,5 +93,60 @@ public class BerandaDosenActivity extends AppCompatActivity {
             }
         });
         builder.show();
+    }
+
+    private void fetchUserData(String token) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    URL url = new URL("https://samatif.xyz/login.php?action=get");
+                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                    conn.setRequestMethod("GET");
+                    conn.setRequestProperty("Authorization", "Bearer " + token);
+
+                    InputStream inputStream = conn.getInputStream();
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+                    StringBuilder response = new StringBuilder();
+                    String line;
+
+                    while ((line = reader.readLine()) != null) {
+                        response.append(line);
+                    }
+
+                    reader.close();
+                    inputStream.close();
+
+                    JSONObject jsonObject = new JSONObject(response.toString());
+                    String nama = jsonObject.getString("nama");
+                    String nip = jsonObject.getString("nip");
+
+                    // Simpan NIP dan nama ke SharedPreferences
+                    saveUserDataToSharedPreferences(nama, nip);
+
+                    // Tampilkan di log
+                    Log.d("UserData", "Nama: " + nama + ", NIP: " + nip);
+
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            namaDosenTextView.setText(nama);
+                            nipTextView.setText(nip);
+                        }
+                    });
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Log.e("FetchUserData", "Exception: " + e.getMessage());
+                }
+            }
+        }).start();
+    }
+
+    private void saveUserDataToSharedPreferences(String nama, String nip) {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("nama", nama);
+        editor.putString("nip", nip);
+        editor.apply();
     }
 }

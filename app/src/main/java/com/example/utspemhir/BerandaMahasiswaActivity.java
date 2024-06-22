@@ -72,7 +72,8 @@ public class BerandaMahasiswaActivity extends AppCompatActivity {
     }
 
     public void beranda(View view) {
-        // Tidak perlu melakukan apa-apa karena sudah berada di beranda
+        Intent intent = new Intent(BerandaMahasiswaActivity.this, BerandaMahasiswaActivity.class);
+        startActivity(intent);
     }
 
     public void setoran(View view) {
@@ -119,7 +120,7 @@ public class BerandaMahasiswaActivity extends AppCompatActivity {
 
         @Override
         protected String doInBackground(Void... voids) {
-            String urlString = "https://samatif-ml.preview-domain.com/login.php?action=get";
+            String urlString = "https://samatif.xyz/login.php?action=get";
             try {
                 URL url = new URL(urlString);
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -180,7 +181,7 @@ public class BerandaMahasiswaActivity extends AppCompatActivity {
         @Override
         protected String doInBackground(String... params) {
             String nim = params[0];
-            String urlString = "https://samatif-ml.preview-domain.com/mahasiswa/by-nim.php?nim=" + nim;
+            String urlString = "https://samatif.xyz/mahasiswa/by-nim.php?nim=" + nim;
             try {
                 URL url = new URL(urlString);
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();

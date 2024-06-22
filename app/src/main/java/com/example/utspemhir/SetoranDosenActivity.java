@@ -1,10 +1,14 @@
 package com.example.utspemhir;
+
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
@@ -26,6 +30,10 @@ import retrofit2.Response;
 public class SetoranDosenActivity extends AppCompatActivity implements MyAdapter.ItemClickListener {
 
     DrawerLayout drawerLayout;
+
+    TextView namaUserTextView;
+    TextView namaDosenTextView;
+    TextView nipTextView;
     RecyclerView recyclerView;
     MyAdapter adapter;
     List<Item> data = new ArrayList<>();
@@ -39,6 +47,10 @@ public class SetoranDosenActivity extends AppCompatActivity implements MyAdapter
         drawerLayout = findViewById(R.id.drawer_layer);
         recyclerView = findViewById(R.id.recyclerview);
         spinner = findViewById(R.id.spinner);
+
+        View sidebarView = findViewById(R.id.sidebardosen);
+        namaDosenTextView = sidebarView.findViewById(R.id.namadosen);
+        nipTextView = sidebarView.findViewById(R.id.nip);
 
         adapter = new MyAdapter(this, data, this);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -72,8 +84,17 @@ public class SetoranDosenActivity extends AppCompatActivity implements MyAdapter
     }
 
     private void fetchDataFromEndpoint() {
-        ApiService apiService = RetrofitClient.getClient("https://samatif.000webhostapp.com/").create(ApiService.class);
-        Call<DosenResponse> call = apiService.getDosenByNip("19981");
+        SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        String token = sharedPreferences.getString("jwt_token", ""); // Ambil token dari SharedPreferences
+        String nip = sharedPreferences.getString("nip", ""); // Ambil nip dari SharedPreferences
+
+        if (token.isEmpty()) {
+            Toast.makeText(this, "Token tidak ditemukan", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        ApiService apiService = RetrofitClient.getClient("https://samatif.xyz/", token).create(ApiService.class);
+        Call<DosenResponse> call = apiService.getDosenByNip(nip);
 
         call.enqueue(new Callback<DosenResponse>() {
             @Override
@@ -99,6 +120,7 @@ public class SetoranDosenActivity extends AppCompatActivity implements MyAdapter
             }
         });
     }
+
 
     public void ClickMenu(View view) {
         openDrawer(drawerLayout);

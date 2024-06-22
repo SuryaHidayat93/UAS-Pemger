@@ -22,13 +22,13 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 public class RiwayatMahasiswaActivity extends AppCompatActivity {
 
@@ -45,11 +45,11 @@ public class RiwayatMahasiswaActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_riwayatmahasiswa);
 
-
         SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
         String nim = sharedPreferences.getString("nim", "");
+        String token = sharedPreferences.getString("jwt_token", ""); // Retrieve token from SharedPreferences
 
-        new FetchMahasiswaDataTask().execute(nim);
+        new FetchMahasiswaDataTask(token).execute(nim);
 
         View sidebarView = findViewById(R.id.sidebarmahasiswa);
         namaUserTextView = sidebarView.findViewById(R.id.namamahasiswa);
@@ -61,15 +61,13 @@ public class RiwayatMahasiswaActivity extends AppCompatActivity {
         drawerLayout = findViewById(R.id.drawer_layer);
         recyclerView = findViewById(R.id.recyclerView);
 
-
-
         // Set up RecyclerView
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         dataModelList = new ArrayList<>();
         adapter = new CustomAdapter(this, dataModelList); // Pass context here
         recyclerView.setAdapter(adapter);
 
-        new FetchSetoranData().execute(nim);
+        new FetchSetoranData(token).execute(nim);
 
         // Set up button click listener
         Button buttonProgress = findViewById(R.id.buttonprogress);
@@ -139,27 +137,33 @@ public class RiwayatMahasiswaActivity extends AppCompatActivity {
 
     private class FetchSetoranData extends AsyncTask<String, Void, String> {
 
+        private String token;
+
+        public FetchSetoranData(String token) {
+            this.token = token;
+        }
+
+
         @Override
         protected String doInBackground(String... params) {
             String nim = params[0];
-            String urlString = "https://samatif-ml.preview-domain.com/setoran/by-nim.php?nim=122501";
-            try {
-                URL url = new URL(urlString);
-                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                connection.setRequestMethod("GET");
-                int responseCode = connection.getResponseCode();
+            String urlString = "https://samatif.xyz/setoran/by-nim.php?nim=" + nim;
 
-                if (responseCode == 200) {
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-                    StringBuilder response = new StringBuilder();
-                    String line;
+            OkHttpClient client = new OkHttpClient.Builder()
+                    .addInterceptor(new AuthInterceptor(token))
+                    .build();
 
-                    while ((line = reader.readLine()) != null) {
-                        response.append(line);
-                    }
+            Request request = new Request.Builder()
+                    .url(urlString)
+                    .build();
 
-                    reader.close();
-                    return response.toString();
+            // Log the URL and headers
+            Log.d("FetchSetoranData", "Request URL: " + urlString);
+            Log.d("FetchSetoranData", "Request Headers: " + request.headers().toString());
+
+            try (Response response = client.newCall(request).execute()) {
+                if (response.isSuccessful()) {
+                    return response.body().string();
                 } else {
                     return null;
                 }
@@ -169,9 +173,12 @@ public class RiwayatMahasiswaActivity extends AppCompatActivity {
             }
         }
 
+
         @Override
         protected void onPostExecute(String result) {
             if (result != null) {
+                Log.d("FetchSetoranData", "Server Response: " + result);  // Tambahkan log ini
+
                 try {
                     JSONObject jsonObject = new JSONObject(result);
                     JSONArray setoranArray = jsonObject.getJSONArray("setoran");
@@ -204,27 +211,30 @@ public class RiwayatMahasiswaActivity extends AppCompatActivity {
 
     private class FetchMahasiswaDataTask extends AsyncTask<String, Void, String> {
 
+        private String token;
+
+        public FetchMahasiswaDataTask(String token) {
+            this.token = token;
+        }
+
         @Override
         protected String doInBackground(String... params) {
             String nim = params[0];
-            String urlString = "https://samatif-ml.preview-domain.com/mahasiswa/by-nim.php?nim=" + nim;
-            try {
-                URL url = new URL(urlString);
-                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                connection.setRequestMethod("GET");
+            String urlString = "https://samatif.xyz/mahasiswa/by-nim.php?nim=" + nim;
 
-                int responseCode = connection.getResponseCode();
-                if (responseCode == HttpURLConnection.HTTP_OK) {
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-                    StringBuilder response = new StringBuilder();
-                    String line;
-                    while ((line = reader.readLine()) != null) {
-                        response.append(line);
-                    }
-                    reader.close();
-                    return response.toString();
+            OkHttpClient client = new OkHttpClient.Builder()
+                    .addInterceptor(new AuthInterceptor(token))
+                    .build();
+
+            Request request = new Request.Builder()
+                    .url(urlString)
+                    .build();
+
+            try (Response response = client.newCall(request).execute()) {
+                if (response.isSuccessful()) {
+                    return response.body().string();
                 } else {
-                    Log.e("FetchMahasiswaDataTask", "Failed to fetch data. Response code: " + responseCode);
+                    Log.e("FetchMahasiswaDataTask", "Failed to fetch data. Response code: " + response.code());
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -235,6 +245,8 @@ public class RiwayatMahasiswaActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(String result) {
             if (result != null) {
+                Log.d("FetchMahasiswaDataTask", "Server Response: " + result);  // Tambahkan log ini
+
                 try {
                     JSONArray jsonArray = new JSONArray(result); // Parse as JSONArray
 
@@ -248,7 +260,7 @@ public class RiwayatMahasiswaActivity extends AppCompatActivity {
                     // Set TextViews with retrieved data
                     namaUserTextView.setText(nama);
                     nimTextView.setText(nim);
-                    semesterTextView.setText("semester: "+semester);
+                    semesterTextView.setText("semester: " + semester);
 
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -258,6 +270,4 @@ public class RiwayatMahasiswaActivity extends AppCompatActivity {
             }
         }
     }
-
-
 }

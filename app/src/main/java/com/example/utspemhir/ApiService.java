@@ -1,15 +1,14 @@
 package com.example.utspemhir;
 
 import java.util.List;
-import java.util.Map;
 
 import retrofit2.Call;
 import retrofit2.http.Field;
-import retrofit2.http.FieldMap;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.Query;
+import retrofit2.http.Url;
 
 public interface ApiService {
     @GET("dosenpa/by-nip.php")  // Contoh endpoint untuk mendapatkan dosen berdasarkan NIP
@@ -40,4 +39,8 @@ public interface ApiService {
 
     @GET("setoran/by-nim.php")
     Call<SetoranResponse> getSetoranDetails(@Query("nim") String nim);
+
+    @GET
+    Call<String> getData(@Url String url);
+
 }

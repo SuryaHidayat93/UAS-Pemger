@@ -7,8 +7,10 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -72,7 +74,15 @@ public class RiwayatDosenActivity extends AppCompatActivity implements MyAdapter
     }
 
     private void fetchDataFromEndpoint() {
-        ApiService apiService = RetrofitClient.getClient("https://samatif.000webhostapp.com/").create(ApiService.class);
+        SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        String token = sharedPreferences.getString("token", ""); // Ambil token dari SharedPreferences
+
+        if (token.isEmpty()) {
+            Toast.makeText(this, "Token tidak ditemukan", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        ApiService apiService = RetrofitClient.getClient("https://samatif-ml.preview-domain.com/", token).create(ApiService.class);
         Call<DosenResponse> call = apiService.getDosenByNip("19981");
 
         call.enqueue(new Callback<DosenResponse>() {

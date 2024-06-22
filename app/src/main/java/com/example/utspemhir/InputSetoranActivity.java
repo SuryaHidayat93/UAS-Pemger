@@ -6,6 +6,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 
 import android.app.DatePickerDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -22,6 +23,7 @@ import com.google.android.material.snackbar.Snackbar;
 import java.util.Calendar;
 import java.util.List;
 
+import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -37,11 +39,18 @@ public class InputSetoranActivity extends AppCompatActivity {
     private DatePickerDialog datePickerDialog;
     private Button dateButton;
     private List<Surah> surahList;
+    private String token;
+    private String nip;  // Tambahkan variabel nip
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_inputsetoran);
+
+        // Ambil token dari SharedPreferences
+        SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
+        token = sharedPreferences.getString("jwt_token", "");
+        nip = sharedPreferences.getString("nip", "");  // Ambil nip dari SharedPreferences
 
         String nama = getIntent().getStringExtra("nama");
         String nim = getIntent().getStringExtra("nim");
@@ -98,9 +107,14 @@ public class InputSetoranActivity extends AppCompatActivity {
     }
 
     private void fetchSurahData() {
+        OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                .addInterceptor(new AuthInterceptor(token))
+                .build();
+
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("https://samatif.000webhostapp.com/")
+                .baseUrl("https://samatif.xyz/")
                 .addConverterFactory(GsonConverterFactory.create())
+                .client(okHttpClient)
                 .build();
 
         ApiService apiService = retrofit.create(ApiService.class);
@@ -199,23 +213,18 @@ public class InputSetoranActivity extends AppCompatActivity {
 
     public void SimpanButtonClick(View view) {
         // Mengambil data nim dari Intent dan menghapus teks tambahan jika ada
-        String nim = getIntent().getStringExtra("nim").trim();
-
-        // Pastikan nim hanya berisi angka, tanpa teks tambahan
-        if (nim.startsWith("Nim:")) {
-            nim = nim.replace("Nim:", "").trim();
+        String nim = getIntent().getStringExtra("nim");
+        if (nim.contains(":")) {
+            nim = nim.split(":")[1].trim();
         }
 
-        String nip = "19981"; // Replace with the actual NIP value
+        // nip sudah diambil dari SharedPreferences saat onCreate
+        int idSurah = getSelectedSurahId();
         String tanggal = dateButton.getText().toString();
         String kelancaran = autoCompleteTxt2.getText().toString();
         String tajwid = autoCompleteTxt3.getText().toString();
         String makhrajulHuruf = autoCompleteTxt4.getText().toString();
 
-        // Assuming you have a method to get the selected Surah ID
-        int idSurah = getSelectedSurahId();
-
-        // Log all the data
         Log.d("SimpanButtonClick", "nim: " + nim);
         Log.d("SimpanButtonClick", "nip: " + nip);
         Log.d("SimpanButtonClick", "idSurah: " + idSurah);
@@ -247,9 +256,14 @@ public class InputSetoranActivity extends AppCompatActivity {
     }
 
     private void submitSetoran(String nim, String nip, int idSurah, String tanggal, String kelancaran, String tajwid, String makhrajulHuruf) {
+        OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                .addInterceptor(new AuthInterceptor(token))
+                .build();
+
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("https://samatif.000webhostapp.com/")
+                .baseUrl("https://samatif.xyz/")
                 .addConverterFactory(GsonConverterFactory.create())
+                .client(okHttpClient)
                 .build();
 
         ApiService apiService = retrofit.create(ApiService.class);

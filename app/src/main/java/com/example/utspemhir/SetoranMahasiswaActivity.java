@@ -1,14 +1,23 @@
 package com.example.utspemhir;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Bitmap.CompressFormat;
+import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
@@ -23,8 +32,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
@@ -68,16 +80,17 @@ public class SetoranMahasiswaActivity extends AppCompatActivity {
         nimTextView = sidebarView.findViewById(R.id.nim);
         semesterTextView = sidebarView.findViewById(R.id.semester);
 
-        // Get NIM from SharedPreferences
+        // Get NIM and Token from SharedPreferences
         SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
         String nim = sharedPreferences.getString("nim", "");
+        String token = sharedPreferences.getString("jwt_token", ""); // Get token from SharedPreferences
 
-        if (nim.isEmpty()) {
-            Log.w(TAG, "NIM is empty or not available in SharedPreferences");
+        if (nim.isEmpty() || token.isEmpty()) {
+            Log.w(TAG, "NIM or token is empty or not available in SharedPreferences");
         } else {
             Log.d(TAG, "NIM from SharedPreferences: " + nim);
-            fetchSurahData(nim);
-            fetchSetoranData(nim);
+            fetchSurahData(nim, token);
+            fetchSetoranData(nim, token);
             new FetchMahasiswaDataTask().execute(nim);
         }
     }
@@ -135,8 +148,8 @@ public class SetoranMahasiswaActivity extends AppCompatActivity {
         builder.show();
     }
 
-    private void fetchSurahData(String nim) {
-        ApiService apiService = RetrofitClient.getClient("https://samatif-ml.preview-domain.com/").create(ApiService.class);
+    private void fetchSurahData(String nim, String token) {
+        ApiService apiService = RetrofitClient.getClient("https://samatif.xyz/", token).create(ApiService.class);
         Call<SurahResponse> call = apiService.getSurahDetails(nim);
 
         call.enqueue(new Callback<SurahResponse>() {
@@ -158,8 +171,8 @@ public class SetoranMahasiswaActivity extends AppCompatActivity {
         });
     }
 
-    private void fetchSetoranData(String nim) {
-        ApiService apiService = RetrofitClient.getClient("https://samatif-ml.preview-domain.com/").create(ApiService.class);
+    private void fetchSetoranData(String nim, String token) {
+        ApiService apiService = RetrofitClient.getClient("https://samatif.xyz/", token).create(ApiService.class);
         Call<SetoranResponse> call = apiService.getSetoranDetails(nim);
 
         call.enqueue(new Callback<SetoranResponse>() {
@@ -229,7 +242,7 @@ public class SetoranMahasiswaActivity extends AppCompatActivity {
         @Override
         protected String doInBackground(String... params) {
             String nim = params[0];
-            String urlString = "https://samatif-ml.preview-domain.com/mahasiswa/by-nim.php?nim=" + nim;
+            String urlString = "https://samatif.xyz/mahasiswa/by-nim.php?nim=" + nim;
             try {
                 URL url = new URL(urlString);
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -257,16 +270,20 @@ public class SetoranMahasiswaActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(String result) {
             if (result != null) {
-                Log.d("FetchMahasiswaDataTask", "Response: " + result);
                 try {
-                    JSONObject jsonObject = new JSONObject(result);
-                    String nama = jsonObject.getString("nama");
-                    String nim = jsonObject.getString("nim");
-                    String semester = jsonObject.getString("semester");
+                    JSONArray jsonArray = new JSONArray(result); // Parse as JSONArray
 
+                    // Assuming you only need the first object if multiple are returned
+                    JSONObject jsonObject = jsonArray.getJSONObject(0); // Get the first object
+
+                    String nama = jsonObject.getString("Nama"); // "Nama" is the key based on your example response
+                    String nim = jsonObject.getString("NIM");
+                    String semester = jsonObject.getString("Semester");
+
+                    // Set TextViews with retrieved data
                     namaUserTextView.setText(nama);
                     nimTextView.setText(nim);
-                    semesterTextView.setText(semester);
+                    semesterTextView.setText("semester: "+semester);
 
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -275,5 +292,94 @@ public class SetoranMahasiswaActivity extends AppCompatActivity {
                 Log.e("FetchMahasiswaDataTask", "Failed to fetch data.");
             }
         }
+    }
+
+    // Method untuk mengambil screenshot dari RecyclerView
+    private Bitmap getRecyclerViewScreenshot() {
+        // Membuat bitmap kosong dengan ukuran yang sama dengan RecyclerView
+        Bitmap bitmap = Bitmap.createBitmap(recyclerView.getWidth(), recyclerView.getHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        recyclerView.draw(canvas);
+        return bitmap;
+    }
+
+    // Method untuk menyimpan screenshot ke penyimpanan eksternal
+    private void saveBitmap(Bitmap bitmap) {
+        // Simpan gambar menggunakan MediaStore untuk Android Q (API level 29) ke atas
+        String filename = "recyclerview_screenshot.png";
+        ContentValues values = new ContentValues();
+        values.put(MediaStore.Images.Media.DISPLAY_NAME, filename);
+        values.put(MediaStore.Images.Media.MIME_TYPE, "image/png");
+        values.put(MediaStore.Images.Media.RELATIVE_PATH, Environment.DIRECTORY_PICTURES);
+
+        // Cek versi Android untuk menentukan cara penyimpanan
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            saveBitmapToMediaStoreQ(bitmap, values);
+        } else {
+            saveBitmapToMediaStoreLegacy(bitmap, filename);
+        }
+    }
+
+    // Menyimpan gambar ke MediaStore untuk Android Q (API level 29) ke atas
+    private void saveBitmapToMediaStoreQ(Bitmap bitmap, ContentValues values) {
+        OutputStream outputStream = null;
+        try {
+            // Insert image into MediaStore
+            getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+
+            // Get the new file URI
+            String newImageUri = values.getAsString(MediaStore.Images.Media.RELATIVE_PATH) + File.separator + values.getAsString(MediaStore.Images.Media.DISPLAY_NAME);
+
+            // Open an output stream using the new file URI
+            outputStream = getContentResolver().openOutputStream(Uri.parse(newImageUri));
+            bitmap.compress(CompressFormat.PNG, 100, outputStream);
+
+            Toast.makeText(this, "Screenshot saved to Downloads", Toast.LENGTH_SHORT).show();
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(this, "Failed to save screenshot", Toast.LENGTH_SHORT).show();
+        } finally {
+            try {
+                if (outputStream != null) {
+                    outputStream.flush();
+                    outputStream.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    // Menyimpan gambar ke MediaStore untuk versi Android sebelum Q
+    private void saveBitmapToMediaStoreLegacy(Bitmap bitmap, String filename) {
+        File dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+        File dest = new File(dir, filename);
+
+        try {
+            FileOutputStream out = new FileOutputStream(dest);
+            bitmap.compress(CompressFormat.PNG, 100, out);
+            out.flush();
+            out.close();
+
+            // Notify MediaScanner about the new file so that it is immediately available to the user
+            MediaStore.Images.Media.insertImage(getContentResolver(), dest.getAbsolutePath(), filename, null);
+
+            Toast.makeText(this, "Screenshot saved to Downloads", Toast.LENGTH_SHORT).show();
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(this, "Failed to save screenshot", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    // Method untuk menangani pengambilan screenshot dan menyimpannya
+    public void downloadScreenshot(View view) {
+        // Ambil gambar dari RecyclerView
+        Bitmap bitmap = getRecyclerViewScreenshot();
+
+        // Simpan gambar ke penyimpanan eksternal
+        saveBitmap(bitmap);
+
+        // Opsional: Tampilkan pesan atau aksi setelah pengambilan screenshot
+        Toast.makeText(this, "Screenshot diambil dan disimpan", Toast.LENGTH_SHORT).show();
     }
 }
