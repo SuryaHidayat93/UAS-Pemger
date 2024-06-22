@@ -228,6 +228,12 @@ public class BerandaMahasiswaActivity extends AppCompatActivity {
                             nimTextView.setText(nim);
                             semesterTextView.setText("Semester " + semester);
 
+                            // Simpan Nama ke SharedPreferences
+                            SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
+                            SharedPreferences.Editor editor = sharedPreferences.edit();
+                            editor.putString("nama", nama);
+                            editor.apply();
+
                             Log.d("FetchMahasiswaDataTask", "Nama: " + nama);
                             Log.d("FetchMahasiswaDataTask", "NIM: " + nim);
                             Log.d("FetchMahasiswaDataTask", "Semester: " + semester);

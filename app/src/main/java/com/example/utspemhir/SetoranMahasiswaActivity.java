@@ -7,6 +7,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.Bitmap.CompressFormat;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -15,6 +17,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.util.LruCache;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -293,93 +296,87 @@ public class SetoranMahasiswaActivity extends AppCompatActivity {
             }
         }
     }
-
-    // Method untuk mengambil screenshot dari RecyclerView
-    private Bitmap getRecyclerViewScreenshot() {
-        // Membuat bitmap kosong dengan ukuran yang sama dengan RecyclerView
-        Bitmap bitmap = Bitmap.createBitmap(recyclerView.getWidth(), recyclerView.getHeight(), Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(bitmap);
-        recyclerView.draw(canvas);
-        return bitmap;
-    }
-
-    // Method untuk menyimpan screenshot ke penyimpanan eksternal
-    private void saveBitmap(Bitmap bitmap) {
-        // Simpan gambar menggunakan MediaStore untuk Android Q (API level 29) ke atas
-        String filename = "recyclerview_screenshot.png";
-        ContentValues values = new ContentValues();
-        values.put(MediaStore.Images.Media.DISPLAY_NAME, filename);
-        values.put(MediaStore.Images.Media.MIME_TYPE, "image/png");
-        values.put(MediaStore.Images.Media.RELATIVE_PATH, Environment.DIRECTORY_PICTURES);
-
-        // Cek versi Android untuk menentukan cara penyimpanan
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            saveBitmapToMediaStoreQ(bitmap, values);
+    public void saveBitmap(View view) {
+        Bitmap bitmap = getRecyclerViewScreenshot(recyclerView);
+        if (bitmap != null) {
+            saveBitmap(bitmap, "screenshot.png");
         } else {
-            saveBitmapToMediaStoreLegacy(bitmap, filename);
+            Log.e(TAG, "Failed to capture screenshot from RecyclerView");
         }
     }
 
-    // Menyimpan gambar ke MediaStore untuk Android Q (API level 29) ke atas
-    private void saveBitmapToMediaStoreQ(Bitmap bitmap, ContentValues values) {
-        OutputStream outputStream = null;
-        try {
-            // Insert image into MediaStore
-            getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+    private Bitmap getRecyclerViewScreenshot(RecyclerView view) {
+        RecyclerView.Adapter adapter = view.getAdapter();
+        if (adapter == null) {
+            return null;
+        }
 
-            // Get the new file URI
-            String newImageUri = values.getAsString(MediaStore.Images.Media.RELATIVE_PATH) + File.separator + values.getAsString(MediaStore.Images.Media.DISPLAY_NAME);
+        Paint paint = new Paint();
+        int height = 0;
+        final int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);
+        final int cacheSize = maxMemory / 8;
+        LruCache<String, Bitmap> bitmapCache = new LruCache<>(cacheSize);
 
-            // Open an output stream using the new file URI
-            outputStream = getContentResolver().openOutputStream(Uri.parse(newImageUri));
-            bitmap.compress(CompressFormat.PNG, 100, outputStream);
+        for (int i = 0; i < adapter.getItemCount(); i++) {
+            TableAdapter.TableViewHolder holder = (TableAdapter.TableViewHolder) adapter.createViewHolder(view, adapter.getItemViewType(i));
+            adapter.onBindViewHolder(holder, i);
+            holder.itemView.measure(View.MeasureSpec.makeMeasureSpec(view.getWidth(), View.MeasureSpec.EXACTLY),
+                    View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+            holder.itemView.layout(0, 0, holder.itemView.getMeasuredWidth(), holder.itemView.getMeasuredHeight());
+            holder.itemView.setDrawingCacheEnabled(true);
+            holder.itemView.buildDrawingCache();
+            Bitmap drawingCache = holder.itemView.getDrawingCache();
+            if (drawingCache != null) {
+                bitmapCache.put(String.valueOf(i), drawingCache);
+            }
+            height += holder.itemView.getMeasuredHeight();
+        }
 
-            Toast.makeText(this, "Screenshot saved to Downloads", Toast.LENGTH_SHORT).show();
-        } catch (Exception e) {
-            e.printStackTrace();
-            Toast.makeText(this, "Failed to save screenshot", Toast.LENGTH_SHORT).show();
-        } finally {
-            try {
-                if (outputStream != null) {
-                    outputStream.flush();
-                    outputStream.close();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
+        Bitmap bigBitmap = Bitmap.createBitmap(view.getMeasuredWidth(), height, Bitmap.Config.ARGB_8888);
+        Canvas bigCanvas = new Canvas(bigBitmap);
+        bigCanvas.drawColor(Color.WHITE);
+        height = 0;
+        for (int i = 0; i < adapter.getItemCount(); i++) {
+            Bitmap bitmap = bitmapCache.get(String.valueOf(i));
+            if (bitmap != null) {
+                bigCanvas.drawBitmap(bitmap, 0f, height, paint);
+                height += bitmap.getHeight();
+                bitmap.recycle();
             }
         }
+        return bigBitmap;
     }
 
-    // Menyimpan gambar ke MediaStore untuk versi Android sebelum Q
-    private void saveBitmapToMediaStoreLegacy(Bitmap bitmap, String filename) {
-        File dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
-        File dest = new File(dir, filename);
-
+    private void saveBitmap(Bitmap bitmap, String fileName) {
+        OutputStream outputStream;
         try {
-            FileOutputStream out = new FileOutputStream(dest);
-            bitmap.compress(CompressFormat.PNG, 100, out);
-            out.flush();
-            out.close();
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                ContentValues values = new ContentValues();
+                values.put(MediaStore.Images.Media.DISPLAY_NAME, fileName);
+                values.put(MediaStore.Images.Media.MIME_TYPE, "image/png");
+                values.put(MediaStore.Images.Media.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS);
+                Uri uri = getContentResolver().insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, values);
+                outputStream = getContentResolver().openOutputStream(uri);
+            } else {
+                File directory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+                if (!directory.exists()) {
+                    directory.mkdirs();
+                }
+                File file = new File(directory, fileName);
+                outputStream = new FileOutputStream(file);
+            }
 
-            // Notify MediaScanner about the new file so that it is immediately available to the user
-            MediaStore.Images.Media.insertImage(getContentResolver(), dest.getAbsolutePath(), filename, null);
+            bitmap.compress(CompressFormat.PNG, 100, outputStream);
+            outputStream.flush();
+            outputStream.close();
 
-            Toast.makeText(this, "Screenshot saved to Downloads", Toast.LENGTH_SHORT).show();
-        } catch (Exception e) {
-            e.printStackTrace();
+            Toast.makeText(this, "Download successfully", Toast.LENGTH_SHORT).show();
+        } catch (IOException e) {
+            Log.e(TAG, "Error saving screenshot", e);
             Toast.makeText(this, "Failed to save screenshot", Toast.LENGTH_SHORT).show();
         }
     }
-
-    // Method untuk menangani pengambilan screenshot dan menyimpannya
     public void downloadScreenshot(View view) {
-        // Ambil gambar dari RecyclerView
-        Bitmap bitmap = getRecyclerViewScreenshot();
-
-        // Simpan gambar ke penyimpanan eksternal
-        saveBitmap(bitmap);
-
-        // Opsional: Tampilkan pesan atau aksi setelah pengambilan screenshot
-        Toast.makeText(this, "Screenshot diambil dan disimpan", Toast.LENGTH_SHORT).show();
+        saveBitmap(view);  // Panggil metode saveBitmap yang sudah ada
     }
 }

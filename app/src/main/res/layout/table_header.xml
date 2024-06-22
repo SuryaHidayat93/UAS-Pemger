@@ -4,7 +4,8 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal"
     android:padding="8dp"
-    android:background="@color/white">
+    android:background="@color/white"
+    android:id="@+id/table_header">
 
     <TextView
         android:id="@+id/tv_header_surah"
