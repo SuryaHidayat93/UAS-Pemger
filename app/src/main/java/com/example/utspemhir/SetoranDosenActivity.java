@@ -44,7 +44,6 @@ public class SetoranDosenActivity extends AppCompatActivity implements MyAdapter
 
         drawerLayout = findViewById(R.id.drawer_layer);
         recyclerView = findViewById(R.id.recyclerview);
-        spinner = findViewById(R.id.spinner);
 
         View sidebarView = findViewById(R.id.sidebardosen);
         namaDosenTextView = sidebarView.findViewById(R.id.namadosen);
@@ -54,8 +53,7 @@ public class SetoranDosenActivity extends AppCompatActivity implements MyAdapter
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
 
-        // Inisialisasi Spinner
-        initializeSpinner();
+
 
         // Ambil data dari SharedPreferences dan set ke TextView
         SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
@@ -74,25 +72,6 @@ public class SetoranDosenActivity extends AppCompatActivity implements MyAdapter
         fetchDataFromEndpoint();
     }
 
-    private void initializeSpinner() {
-        String[] items = {"", "Semester 1", "Semester 2", "Semester 3", "Semester 4", "Semester 5"};
-        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, items);
-        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner.setAdapter(spinnerAdapter);
-
-        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                String selectedItem = (String) parent.getItemAtPosition(position);
-                Toast.makeText(SetoranDosenActivity.this, "Selected: " + selectedItem, Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-                // Tidak ada yang dipilih
-            }
-        });
-    }
 
     private void fetchDataFromEndpoint() {
         SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
@@ -116,7 +95,7 @@ public class SetoranDosenActivity extends AppCompatActivity implements MyAdapter
                         List<Student> mahasiswaList = dosenList.get(0).getMahasiswa();
                         data.clear();
                         for (Student student : mahasiswaList) {
-                            data.add(new Item("Nama: " + student.getNama(), "Nim: " + student.getNIM(), "Semester " + student.getSemester(), R.drawable.gambar1));
+                            data.add(new Item( student.getNama(),  student.getNIM(), "Semester " + student.getSemester(), R.drawable.gambar1));
                         }
                         adapter.notifyDataSetChanged();
                     }

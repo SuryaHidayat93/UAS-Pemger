@@ -20,6 +20,7 @@
 
         <TextView
             android:id="@+id/nama"
+            android:fontFamily="@font/montserrat_regular"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
@@ -28,6 +29,7 @@
 
         <TextView
             android:id="@+id/nim"
+            android:fontFamily="@font/montserrat_regular"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
@@ -41,7 +43,8 @@
             android:layout_marginTop="20dp"
             android:gravity="center"
             android:padding="8dp"
-            android:text="Surah"
+            android:fontFamily="@font/montserrat_regular"
+            android:text="Pilih Surah"
             android:textSize="20sp" />
 
         <com.google.android.material.textfield.TextInputLayout
@@ -49,18 +52,24 @@
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
             android:hint="@string/surah"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu">
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+            android:background="@drawable/text_input_background">
+
             <AutoCompleteTextView
                 android:id="@+id/auto_complete_txt"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
                 android:inputType="none"/>
+
         </com.google.android.material.textfield.TextInputLayout>
+
 
         <TextView
             android:id="@+id/textView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:fontFamily="@font/montserrat_regular"
             android:text="Tanggal"
             android:layout_marginLeft="15dp"
             android:textSize="20sp"
@@ -92,6 +101,7 @@
             android:layout_marginLeft="15dp"
             android:layout_marginTop="20dp"
             android:gravity="center"
+            android:fontFamily="@font/montserrat_regular"
             android:padding="8dp"
             android:text="Kelancaran"
             android:textSize="20sp" />
@@ -101,12 +111,14 @@
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
             android:hint="@string/kelancaran"
+            android:background="@drawable/text_input_background"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu">
             <AutoCompleteTextView
                 android:id="@+id/auto_complete_txt2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="none"/>
+                android:inputType="none"
+                android:background="@android:color/transparent"/>
         </com.google.android.material.textfield.TextInputLayout>
 
         <TextView
@@ -115,6 +127,7 @@
             android:layout_marginLeft="15dp"
             android:layout_marginTop="20dp"
             android:gravity="center"
+            android:fontFamily="@font/montserrat_regular"
             android:padding="8dp"
             android:text="Tajwid"
             android:textSize="20sp" />
@@ -124,12 +137,14 @@
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
             android:hint="@string/tajwid"
+            android:background="@drawable/text_input_background"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu">
             <AutoCompleteTextView
                 android:id="@+id/auto_complete_txt3"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="none"/>
+                android:inputType="none"
+                android:background="@android:color/transparent"/>
         </com.google.android.material.textfield.TextInputLayout>
         <TextView
             android:layout_width="wrap_content"
@@ -137,6 +152,7 @@
             android:layout_marginLeft="15dp"
             android:layout_marginTop="20dp"
             android:gravity="center"
+            android:fontFamily="@font/montserrat_regular"
             android:padding="8dp"
             android:text="Makhrajul Huruf"
             android:textSize="20sp" />
@@ -146,12 +162,14 @@
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
             android:hint="@string/makhrajul"
+            android:background="@drawable/text_input_background"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu">
             <AutoCompleteTextView
                 android:id="@+id/auto_complete_txt4"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="none"/>
+                android:inputType="none"
+                android:background="@android:color/transparent"/>
         </com.google.android.material.textfield.TextInputLayout>
 
         <Button

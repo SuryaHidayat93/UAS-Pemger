@@ -3,6 +3,7 @@ package com.example.utspemhir;
 import java.util.List;
 
 import retrofit2.Call;
+import retrofit2.http.Body;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
@@ -11,6 +12,7 @@ import retrofit2.http.Query;
 import retrofit2.http.Url;
 
 public interface ApiService {
+
     @GET("dosenpa/by-nip.php")  // Contoh endpoint untuk mendapatkan dosen berdasarkan NIP
     Call<DosenResponse> getDosenByNip(@Query("nip") String nip);
 
@@ -33,6 +35,8 @@ public interface ApiService {
             @Query("action") String action,
             @Query("token") String token
     );
+
+
 
     @GET("setoran/sudahbelum.php")
     Call<SurahResponse> getSurahDetails(@Query("nim") String nim);

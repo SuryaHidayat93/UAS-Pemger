@@ -9,6 +9,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Kerja Praktek"
+        android:fontFamily="@font/montserrat_regular"
         android:textSize="16sp"
         android:textColor="@android:color/black" />
 
@@ -23,6 +24,7 @@
         android:max="100"/>
 
     <TextView
+        android:fontFamily="@font/montserrat_regular"
         android:id="@+id/percentage1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -31,6 +33,7 @@
         android:text="0%"
         android:textColor="@android:color/black" />
     <TextView
+        android:fontFamily="@font/montserrat_regular"
         android:id="@+id/title2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -51,6 +54,7 @@
         android:max="100"/>
 
     <TextView
+        android:fontFamily="@font/montserrat_regular"
         android:id="@+id/percentage2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -60,6 +64,7 @@
         android:textColor="@android:color/black" />
 
     <TextView
+        android:fontFamily="@font/montserrat_regular"
         android:id="@+id/title3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -80,6 +85,7 @@
         android:max="100"/>
 
     <TextView
+        android:fontFamily="@font/montserrat_regular"
         android:id="@+id/percentage3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -89,6 +95,7 @@
         android:textColor="@android:color/black" />
 
     <TextView
+        android:fontFamily="@font/montserrat_regular"
         android:id="@+id/title4"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -109,6 +116,7 @@
         android:max="100"/>
 
     <TextView
+        android:fontFamily="@font/montserrat_regular"
         android:id="@+id/percentage4"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -118,6 +126,7 @@
         android:textColor="@android:color/black" />
 
     <TextView
+        android:fontFamily="@font/montserrat_regular"
         android:id="@+id/title5"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -138,6 +147,7 @@
         android:max="100"/>
 
     <TextView
+        android:fontFamily="@font/montserrat_regular"
         android:id="@+id/percentage5"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

@@ -14,14 +14,7 @@
         android:onClick="ClickMenu"
         android:src="@drawable/baseline_menu_24" />
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:drawableLeft="@drawable/baseline_bookblack_24"
-        android:text="Setoran - Input Setoran"
-        android:textColor="@color/black"
-        android:textSize="25dp"
-        android:textStyle="bold" />
+
 
 
 </LinearLayout>

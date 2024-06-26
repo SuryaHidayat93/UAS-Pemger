@@ -31,11 +31,19 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.itextpdf.io.image.ImageData;
+import com.itextpdf.io.image.ImageDataFactory;
+import com.itextpdf.kernel.pdf.PdfDocument;
+import com.itextpdf.kernel.pdf.PdfWriter;
+import com.itextpdf.layout.Document;
+import com.itextpdf.layout.element.Image;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -341,7 +349,7 @@ public class SetoranMahasiswaActivity extends AppCompatActivity {
 
             try (FileOutputStream outputStream = new FileOutputStream(file)) {
                 bitmap.compress(CompressFormat.PNG, 100, outputStream);
-                Toast.makeText(this, "Screenshot saved", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Setoran Berhasil di Simpan", Toast.LENGTH_SHORT).show();
             } catch (IOException e) {
                 e.printStackTrace();
                 Toast.makeText(this, "Failed to save screenshot", Toast.LENGTH_SHORT).show();

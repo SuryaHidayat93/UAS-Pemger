@@ -1,63 +1,89 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_marginTop="10dp"
-    android:orientation="horizontal">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginTop="10dp">
 
+    <androidx.cardview.widget.CardView
+        android:layout_width="350dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_margin="8dp"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="4dp">
 
-    <RelativeLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
-
-        <ImageView
-            android:id="@+id/imageview"
-            android:layout_width="75dp"
-            android:layout_height="75dp"
-            android:layout_marginStart="12dp"
-            android:layout_marginEnd="12dp"
-            android:layout_gravity="center_vertical" />
-
-
-        <TextView
-            android:id="@+id/name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="100dp"
-            android:layout_marginBottom="10dp"
-            android:textColor="@color/black"
-            android:textSize="16sp"
-            tools:text="Nama" />
-
-        <TextView
-            android:id="@+id/nim"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/name"
-            android:layout_marginLeft="100dp"
-            android:layout_marginTop="2dp"
-            android:textColor="@color/black"
-            android:textSize="16sp"
-            tools:text="NIM" />
-
-        <TextView
-            android:id="@+id/semester"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/name"
-            android:layout_marginLeft="100dp"
-            android:layout_marginTop="32dp"
-            android:textColor="@color/black"
-            android:textSize="16sp"
-            tools:text="Semester" />
-
-        <View
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="5dp"
-            android:layout_below="@id/nim"
-            android:layout_marginTop="30dp"
-            android:background="#4ade80" />
-    </RelativeLayout>
+            android:layout_height="wrap_content"
+            android:padding="16dp">
 
+            <RelativeLayout
+                android:layout_width="80dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentTop="true">
 
-</LinearLayout>
+                <TextView
+                    android:id="@+id/text_detail"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="3dp"
+                    android:layout_marginTop="3dp"
+                    android:layout_marginEnd="3dp"
+                    android:layout_marginRight="3dp"
+                    android:layout_marginBottom="3dp"
+                    android:layout_toLeftOf="@id/arrow"
+                    android:fontFamily="@font/montserrat_regular"
+                    android:text="Detail"
+                    android:textSize="10sp" />
+
+                <ImageView
+                    android:id="@+id/arrow"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:src="@drawable/arrow_right" />
+            </RelativeLayout>
+
+            <TextView
+                android:id="@+id/name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="serif"
+                android:layout_marginLeft="10dp"
+                android:layout_marginBottom="10dp"
+                android:textColor="@color/black"
+                android:textSize="20sp"
+                tools:text="Nama" />
+
+            <TextView
+                android:fontFamily="serif"
+                android:id="@+id/nim"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/name"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="2dp"
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                tools:text="NIM" />
+
+            <TextView
+                android:fontFamily="serif"
+                android:id="@+id/semester"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/name"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="32dp"
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                tools:text="Semester" />
+
+        </RelativeLayout>
+    </androidx.cardview.widget.CardView>
+
+</FrameLayout>

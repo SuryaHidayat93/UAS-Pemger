@@ -32,7 +32,7 @@ public class RiwayatDosenActivity extends AppCompatActivity implements MyAdapter
     RecyclerView recyclerView;
     MyAdapter adapter;
     List<Item> data = new ArrayList<>();
-    Spinner spinner;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,14 +41,12 @@ public class RiwayatDosenActivity extends AppCompatActivity implements MyAdapter
 
         drawerLayout = findViewById(R.id.drawer_layer);
         recyclerView = findViewById(R.id.recyclerview);
-        spinner = findViewById(R.id.spinner);
+
 
         adapter = new MyAdapter(this, data, this);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
 
-        // Initialize Spinner
-        initializeSpinner();
 
         // Fetch data from endpoint
         fetchDataFromEndpoint();
@@ -75,25 +73,7 @@ public class RiwayatDosenActivity extends AppCompatActivity implements MyAdapter
         });
     }
 
-    private void initializeSpinner() {
-        String[] items = {"", "Semester 1", "Semester 2", "Semester 3", "Semester 4", "Semester 5"};
-        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, items);
-        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner.setAdapter(spinnerAdapter);
 
-        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                String selectedItem = (String) parent.getItemAtPosition(position);
-                Toast.makeText(RiwayatDosenActivity.this, "Selected: " + selectedItem, Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-                // Nothing selected
-            }
-        });
-    }
 
     private void fetchDataFromEndpoint() {
         SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);

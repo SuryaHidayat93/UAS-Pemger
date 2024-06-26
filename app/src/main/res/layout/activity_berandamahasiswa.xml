@@ -26,7 +26,7 @@
             android:layout_marginLeft="20dp"
             android:textColor="#000080"
             android:textStyle="bold"
-            android:fontFamily="sans-serif-black"
+            android:fontFamily="@font/montserrat_bold"
             android:layout_marginBottom="4dp"/>
 
         <TextView
@@ -38,37 +38,19 @@
             android:textSize="25sp"
             android:textColor="#05F45D"
             android:textStyle="italic"
-            android:fontFamily="sans-serif-black"
+            android:fontFamily="@font/montserrat_bold"
             android:layout_marginBottom="16dp"/>
 
         <TextView
-            android:id="@+id/description_text_1"
-            android:layout_width="wrap_content"
+            android:layout_width="350dp"
             android:layout_height="wrap_content"
-            android:text="   Aplikasi Setoran Hafalan Mahasiswa adalah platform yang dirancang untuk memudahkan mahasiswa dalam mengatur dan melacak progres hafalan mereka. Dalam konteks ini, hafalan merujuk pada ayat-ayat Al-Qur'an, teks-teks klasik, atau materi akademis lain yang perlu dipelajari dan dihafal secara berkala."
-            android:textSize="16sp"
+            android:text="     Setiap hari, sedikit demi sedikit, mari kita tambahkan hafalan Al-Qur'an ke dalam hati kita."
+            android:textSize="18sp"
             android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
-            android:layout_marginBottom="16dp"/>
-
-        <TextView
-            android:id="@+id/description_text_2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="   Dengan aplikasi ini, mahasiswa dapat dengan mudah merekam setoran hafalan mereka, mendapatkan umpan balik dari dosen atau mentor, serta memantau perkembangan mereka dari waktu ke waktu. Fitur-fitur yang intuitif dan user-friendly memastikan pengalaman pengguna yang menyenangkan dan efektif."
-            android:textSize="16sp"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
-            android:layout_marginBottom="16dp"/>
-
-        <TextView
-            android:id="@+id/description_text_3"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="   Selamat menggunakan Aplikasi Setoran Hafalan Mahasiswa! Semoga alat ini membantu Anda dalam mencapai tujuan akademis dan spiritual Anda dengan lebih teratur dan sistematis. Teruslah berusaha dan jangan pernah berhenti belajar."
-            android:textSize="16sp"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"/>
+            android:fontFamily="@font/montserrat_bold"
+            android:textColor="@color/black"
+            android:padding="16dp"
+            android:lineSpacingExtra="6dp"/>
     </LinearLayout>
 
     <RelativeLayout

@@ -1,11 +1,14 @@
 package com.example.utspemhir;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -13,12 +16,13 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.io.BufferedReader;
-import java.io.OutputStream;
 import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
+
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 public class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
@@ -49,6 +53,32 @@ public class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             holder.textViewKelancaran.setText(data.getKelancaran());
             holder.textViewTajwid.setText(data.getTajwid());
             holder.textViewMakhrajulHuruf.setText(data.getMakhrajulHuruf());
+
+            holder.itemView.setOnLongClickListener(v -> {
+                SharedPreferences sharedPreferences = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+                String role = sharedPreferences.getString("user_role", null);
+
+                if ("dosen".equals(role)) {
+                    PopupMenu popup = new PopupMenu(context, holder.itemView);
+                    popup.inflate(R.menu.popup_menu);
+                    popup.setOnMenuItemClickListener(item -> {
+                        if (item.getItemId() == R.id.delete) {
+                            String token = sharedPreferences.getString("jwt_token", null);
+                            if (token != null) {
+                                new DeleteSetoranTask(data.getIdSetoran(), position, token).execute();
+                            } else {
+                                Toast.makeText(context, "Token not found", Toast.LENGTH_SHORT).show();
+                            }
+                            return true;
+                        }
+                        return false;
+                    });
+                    popup.show();
+                } else {
+
+                }
+                return true;
+            });
         }
     }
 
@@ -60,43 +90,44 @@ public class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     private class DeleteSetoranTask extends AsyncTask<Void, Void, Boolean> {
         private int idSetoran;
         private int position;
+        private String token;
 
-        public DeleteSetoranTask(int idSetoran, int position) {
+        public DeleteSetoranTask(int idSetoran, int position, String token) {
             this.idSetoran = idSetoran;
             this.position = position;
+            this.token = token;
         }
 
         @Override
         protected Boolean doInBackground(Void... voids) {
             try {
-                Log.d("DeleteSetoranTask", "Deleting id_setoran: " + idSetoran); // Log the id_setoran
+                Log.d("DeleteSetoranTask", "Deleting id_setoran: " + idSetoran);
 
-                URL url = new URL("https://samatif.000webhostapp.com/setoran/delete.php");
-                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                connection.setRequestMethod("POST");
-                connection.setDoOutput(true);
+                OkHttpClient client = new OkHttpClient.Builder()
+                        .addInterceptor(new AuthInterceptor(token))
+                        .build();
 
+                String url = "https://samatif.xyz/setoran/delete.php";
                 String postData = "id_setoran=" + idSetoran;
-                OutputStream os = connection.getOutputStream();
-                os.write(postData.getBytes(StandardCharsets.UTF_8));
-                os.flush();
-                os.close();
 
-                int responseCode = connection.getResponseCode();
-                Log.d("DeleteSetoranTask", "Response Code: " + responseCode); // Log the response code
+                RequestBody body = RequestBody.create(postData, okhttp3.MediaType.parse("application/x-www-form-urlencoded"));
+                Request request = new Request.Builder()
+                        .url(url)
+                        .post(body)
+                        .build();
 
-                BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-                String inputLine;
-                StringBuilder response = new StringBuilder();
+                Response response = client.newCall(request).execute();
 
-                while ((inputLine = in.readLine()) != null) {
-                    response.append(inputLine);
+                Log.d("DeleteSetoranTask", "Response Code: " + response.code());
+
+                if (response.isSuccessful()) {
+                    String responseBody = response.body().string();
+                    Log.d("DeleteSetoranTask", "Response: " + responseBody);
+
+                    return responseBody.contains("success");
                 }
-                in.close();
 
-                Log.d("DeleteSetoranTask", "Response: " + response.toString()); // Log the response
-
-                return response.toString().contains("success"); // Assuming the server responds with "success" on successful deletion
+                return false;
 
             } catch (Exception e) {
                 e.printStackTrace();

@@ -34,7 +34,6 @@ public class MyAdapter extends RecyclerView.Adapter<MyViewHolder> {
         Item item = items.get(position);
         holder.nameView.setText(item.getName());
         holder.nimView.setText(item.getNim());
-        holder.imageView.setImageResource(item.getImage());
         holder.semesterView.setText(item.getSemester());
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override

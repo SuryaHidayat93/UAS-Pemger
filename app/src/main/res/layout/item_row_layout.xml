@@ -131,7 +131,7 @@
                         android:layout_height="wrap_content"
                         android:gravity="center"
                         android:padding="8dp"
-                        android:textSize="10sp"
+                        android:textSize="12sp"
                         android:text="lancar"
                         android:textStyle="bold" />
                 </LinearLayout>

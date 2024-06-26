@@ -62,10 +62,10 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:text="Silahkan Login"
-                android:textSize="36sp"
+                android:textSize="30sp"
                 android:textStyle="bold"
                 android:textColor="@color/black"
-                android:fontFamily="sans-serif-condensed"/>
+                android:fontFamily="@font/montserrat_bold"/>
 
             <EditText
                 android:id="@+id/username"
@@ -74,6 +74,7 @@
                 android:layout_marginTop="40dp"
                 android:background="@drawable/custom_edittext"
                 android:drawablePadding="8dp"
+                android:fontFamily="@font/montserrat_regular"
                 android:hint="Username Anda"
                 android:padding="8dp"
                 android:textColor="@color/black"
@@ -86,6 +87,7 @@
                 android:layout_marginTop="20dp"
                 android:background="@drawable/custom_edittext"
                 android:drawablePadding="8dp"
+                android:fontFamily="@font/montserrat_regular"
                 android:hint="Password Anda"
                 android:inputType="textPassword"
                 android:padding="8dp"
@@ -93,6 +95,7 @@
                 android:textColorHighlight="@color/cardview_dark_background"/>
 
             <TextView
+                android:fontFamily="@font/montserrat_regular"
                 android:id="@+id/forgotpassword"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -109,6 +112,7 @@
                 android:layout_height="60dp"
                 android:layout_marginTop="10dp"
                 android:backgroundTint="#384B8F"
+                android:fontFamily="@font/montserrat_bold"
                 android:text="Login"
                 android:textSize="18sp"
                 app:cornerRadius="20dp"/>

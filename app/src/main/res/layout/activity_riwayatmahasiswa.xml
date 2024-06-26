@@ -18,53 +18,60 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 
-        <RelativeLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/recyclerView"
-            android:layout_centerInParent="true">
-
-
-
-            <Button
-                android:id="@+id/buttonprogress"
-                android:layout_width="300dp"
-                android:layout_centerHorizontal="true"
-                android:layout_height="wrap_content"
-                android:background="@drawable/button_background"
-                />
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/baseline_assessment_24"
-                android:layout_toStartOf="@id/progress"
-                android:layout_centerVertical="true"/>
-            <TextView
-                android:id="@+id/progress"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Progress"
-                android:textSize="24sp"
-                android:textStyle="bold"
-                android:layout_centerInParent="true"
-
-                android:textColor="@color/white"/>
-        </RelativeLayout>
-
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recyclerView"
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_below="@id/menu_toolbar"
             android:layout_marginLeft="5dp"
             android:layout_marginTop="20dp"
             android:layout_marginRight="10dp"
-            android:layout_marginBottom="20dp"
-            android:background="@color/white" />
+            android:layout_marginBottom="20dp">
 
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerView"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:background="@color/white"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toTopOf="@id/btnprogress"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
 
+            <RelativeLayout
+                android:id="@+id/btnprogress"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginBottom="16dp">
 
+                <Button
+                    android:id="@+id/buttonprogress"
+                    android:layout_width="300dp"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/button_background"
+                    android:layout_centerHorizontal="true" />
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/baseline_assessment_24"
+                    android:layout_toStartOf="@id/progress"
+                    android:layout_centerVertical="true" />
+
+                <TextView
+                    android:id="@+id/progress"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Progress"
+                    android:textSize="24sp"
+                    android:textStyle="bold"
+                    android:layout_centerInParent="true"
+                    android:textColor="@color/white" />
+            </RelativeLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
     </RelativeLayout>
 
     <!-- Navigation Drawer -->
@@ -72,6 +79,7 @@
         android:layout_width="300dp"
         android:layout_height="match_parent"
         android:layout_gravity="start">
+
         <include layout="@layout/sidebarmahasiswa" />
     </RelativeLayout>
 

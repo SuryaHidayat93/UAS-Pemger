@@ -33,6 +33,7 @@
                 android:layout_marginTop="60dp"
                 android:gravity="center_vertical"
                 android:text="Farras Lathief "
+                android:fontFamily="@font/montserrat_bold"
                 android:paddingLeft="10dp"
                 android:textColor="@android:color/white"
                 android:textSize="20sp"
@@ -44,6 +45,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
                 android:textSize="20sp"
+                android:fontFamily="@font/montserrat_regular"
                 android:text="nim"
                 android:textColor="@android:color/white"/>
 
@@ -53,6 +55,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
                 android:textSize="20sp"
+                android:fontFamily="@font/montserrat_regular"
                 android:text="semester"
                 android:textColor="@android:color/white"/>
 
@@ -78,6 +81,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:padding="15dp"
+            android:fontFamily="@font/montserrat_regular"
             android:text="Beranda"
             android:textColor="@color/white"
             android:textSize="20dp"
@@ -104,6 +108,7 @@
 
         <TextView
             android:layout_width="0dp"
+            android:fontFamily="@font/montserrat_regular"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:padding="15dp"
@@ -132,6 +137,7 @@
         android:onClick="riwayat">
 
         <TextView
+            android:fontFamily="@font/montserrat_regular"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
