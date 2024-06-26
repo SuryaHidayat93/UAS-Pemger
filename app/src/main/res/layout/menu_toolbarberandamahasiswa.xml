@@ -5,8 +5,9 @@
     android:layout_height="60dp"
     android:orientation="horizontal"
     android:padding="12dp"
-    android:background="@color/white"
+    android:background="@android:color/transparent"
     android:id="@+id/toolbar_mahasiswa"
+
     >
 
     <ImageView

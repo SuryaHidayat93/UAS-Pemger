@@ -1,0 +1,8 @@
+<!-- res/drawable/text_input_background.xml -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="@android:color/transparent"/> <!-- Warna latar belakang -->
+    <corners android:radius="12dp"/> <!-- Radius sudut -->
+    <stroke
+        android:width="2dp"
+        android:color="#000080"/> <!-- Warna border -->
+</shape>
