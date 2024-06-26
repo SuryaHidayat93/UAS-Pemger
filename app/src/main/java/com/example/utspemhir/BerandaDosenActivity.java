@@ -27,6 +27,7 @@ public class BerandaDosenActivity extends AppCompatActivity {
     TextView namaUserTextView;
     TextView namaDosenTextView;
     TextView nipTextView;
+    TextView dosenNameTextView; // Tambahkan ini
     private SharedPreferences sharedPreferences;
 
     @Override
@@ -40,10 +41,15 @@ public class BerandaDosenActivity extends AppCompatActivity {
         View sidebarView = findViewById(R.id.sidebardosen);
         namaDosenTextView = sidebarView.findViewById(R.id.namadosen);
         nipTextView = sidebarView.findViewById(R.id.nip);
+        dosenNameTextView = findViewById(R.id.dosen_name); // Inisialisasi TextView dosen_name
 
         String token = sharedPreferences.getString("jwt_token", "");
         if (!token.isEmpty()) {
             fetchUserData(token);
+        } else {
+            // Jika token kosong, ambil nama dari SharedPreferences
+            String nama = sharedPreferences.getString("nama", "Nama Dosen");
+            dosenNameTextView.setText(nama);
         }
     }
 
@@ -132,6 +138,7 @@ public class BerandaDosenActivity extends AppCompatActivity {
                         public void run() {
                             namaDosenTextView.setText(nama);
                             nipTextView.setText(nip);
+                            dosenNameTextView.setText(nama); // Tampilkan nama di TextView dosen_name
                         }
                     });
 

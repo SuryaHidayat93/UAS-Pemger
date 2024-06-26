@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -9,27 +8,36 @@
     android:gravity="center"
     tools:context=".LoginActivity">
 
+    <ImageView
+        android:id="@+id/imageView5"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:src="@drawable/logouin"
+        android:layout_marginBottom="100dp"/>
 
     <TextView
         android:id="@+id/loginText1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:layout_marginTop="-50dp"
+        android:layout_marginTop="-70dp"
         android:text="Selamat Datang Di SAMATIF"
         android:textSize="25sp"
         android:textStyle="bold"
-        />
+        android:fontFamily="sans-serif-condensed"/>
 
     <TextView
         android:id="@+id/loginText2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:layout_marginTop="15dp"
-        android:layout_marginBottom="50dp"
+        android:layout_marginTop="1dp"
+        android:layout_marginBottom="10dp"
         android:text="Setoran Ayat Mahasiswa TIF"
-        android:textSize="20sp"
+        android:textSize="25sp"
+        android:fontFamily="cursive"
+        android:textStyle="bold"
+        android:textColor="@color/black"
         />
 
     <androidx.cardview.widget.CardView
@@ -42,70 +50,68 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
+            android:layout_height="361dp"
             android:gravity="center"
-            android:padding="24dp">
+            android:orientation="vertical"
+            android:background="@drawable/custom_card_background"
+            android:padding="34dp">
 
             <TextView
+                android:id="@+id/loginText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/loginText"
+                android:layout_gravity="center"
                 android:text="Silahkan Login"
                 android:textSize="36sp"
                 android:textStyle="bold"
-                android:layout_gravity="center"/>
+                android:textColor="@color/black"
+                android:fontFamily="sans-serif-condensed"/>
 
             <EditText
+                android:id="@+id/username"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
-                android:id="@+id/username"
+                android:layout_marginTop="40dp"
                 android:background="@drawable/custom_edittext"
                 android:drawablePadding="8dp"
                 android:hint="Username Anda"
                 android:padding="8dp"
                 android:textColor="@color/black"
-                android:textColorHighlight="@color/cardview_dark_background"
-                android:layout_marginTop="40dp"/>
+                android:textColorHighlight="@color/cardview_dark_background"/>
 
             <EditText
+                android:id="@+id/password"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
-                android:id="@+id/password"
+                android:layout_marginTop="20dp"
                 android:background="@drawable/custom_edittext"
                 android:drawablePadding="8dp"
                 android:hint="Password Anda"
-                android:padding="8dp"
                 android:inputType="textPassword"
+                android:padding="8dp"
                 android:textColor="@color/black"
-                android:textColorHighlight="@color/cardview_dark_background"
-                android:layout_marginTop="20dp"/>
+                android:textColorHighlight="@color/cardview_dark_background"/>
 
             <TextView
-                android:id="@+id/forgotPasswordTextView"
+                android:id="@+id/forgotpassword"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Lupa Password?"
-                android:textColor="@color/black"
-                android:layout_marginRight="90dp"
                 android:layout_marginTop="5dp"
+                android:layout_marginEnd="80dp"
                 android:clickable="true"
-                android:onClick="forgotPasswordClicked"/>
+                android:onClick="forgotPasswordClicked"
+                android:text="Lupa Password?"
+                android:textColor="@color/black"/>
 
             <Button
+                android:id="@+id/loginButton"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
-                android:id="@+id/loginButton"
+                android:layout_marginTop="10dp"
+                android:backgroundTint="#384B8F"
                 android:text="Login"
                 android:textSize="18sp"
-                android:layout_marginTop="10dp"
-                android:backgroundTint="#007bff"
                 app:cornerRadius="20dp"/>
-
-
-
         </LinearLayout>
-
     </androidx.cardview.widget.CardView>
-
 </LinearLayout>

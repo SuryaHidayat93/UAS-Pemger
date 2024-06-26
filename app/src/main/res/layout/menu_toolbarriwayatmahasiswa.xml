@@ -25,12 +25,7 @@
         android:textStyle="bold"
         />
 
-    <TextView
-        android:layout_width="125dp"
-        android:layout_height="wrap_content"
-        android:text="PA. Siti Ramadhani"
-        android:layout_marginLeft="70dp"
-        />
+
 
 
 </LinearLayout>

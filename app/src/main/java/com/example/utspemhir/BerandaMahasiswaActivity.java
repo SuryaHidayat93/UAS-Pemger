@@ -32,6 +32,8 @@ public class BerandaMahasiswaActivity extends AppCompatActivity {
     TextView namaUserTextView;
     TextView nimTextView;
     TextView semesterTextView;
+    TextView namaTextView;
+    TextView namaPaTextView; // TextView untuk nama dosen
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,10 +43,14 @@ public class BerandaMahasiswaActivity extends AppCompatActivity {
         drawerLayout = findViewById(R.id.drawer_layer);
 
         // Mengakses TextViews dari sidebarmahasiswa.xml
-        View sidebarView = findViewById(R.id.sidebarmahasiswa);  // Pastikan ID ini sesuai dengan layout sidebarmahasiswa.xml
+        View sidebarView = findViewById(R.id.sidebarmahasiswa);// Pastikan ID ini sesuai dengan layout sidebarmahasiswa.xml
+        //mengakses toolbar
+        View toolbarView = findViewById(R.id.toolbar_mahasiswa);
         namaUserTextView = sidebarView.findViewById(R.id.namamahasiswa);
         nimTextView = sidebarView.findViewById(R.id.nim);
         semesterTextView = sidebarView.findViewById(R.id.semester);
+        namaTextView = findViewById(R.id.mahasiswa_name);
+        namaPaTextView = toolbarView.findViewById(R.id.nama_pa); // Inisialisasi TextView dosen_name
 
         // Ambil token dari SharedPreferences
         SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
@@ -163,6 +169,7 @@ public class BerandaMahasiswaActivity extends AppCompatActivity {
                         editor.apply();
 
                         new FetchMahasiswaDataTask().execute(nim);
+                        new FetchDosenNameTask().execute(nim); // Panggil AsyncTask untuk mengambil nama dosen
                     } else {
                         Log.e("FetchNIMDataTask", "NIM not found in response.");
                     }
@@ -227,6 +234,7 @@ public class BerandaMahasiswaActivity extends AppCompatActivity {
                             namaUserTextView.setText(nama);
                             nimTextView.setText(nim);
                             semesterTextView.setText("Semester " + semester);
+                            namaTextView.setText(nama);  // Update the mahasiswa_name TextView
 
                             // Simpan Nama ke SharedPreferences
                             SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
@@ -249,6 +257,77 @@ public class BerandaMahasiswaActivity extends AppCompatActivity {
                 }
             } else {
                 Log.e("FetchMahasiswaDataTask", "Failed to fetch data. Result is null.");
+            }
+        }
+    }
+
+    private class FetchDosenNameTask extends AsyncTask<String, Void, String> {
+
+        @Override
+        protected String doInBackground(String... params) {
+            String nim = params[0];
+            String urlString = "https://samatif.xyz/dosenpa/by-nim.php?nim=" + nim;
+            try {
+                URL url = new URL(urlString);
+                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                connection.setRequestMethod("GET");
+                connection.setRequestProperty("Authorization", "Bearer " + token);
+
+                int responseCode = connection.getResponseCode();
+                if (responseCode == HttpURLConnection.HTTP_OK) {
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                    StringBuilder response = new StringBuilder();
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        response.append(line);
+                    }
+                    reader.close();
+                    return response.toString();
+                } else {
+                    Log.e("FetchDosenNameTask", "Failed to fetch data. Response code: " + responseCode);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            if (result != null) {
+                Log.d("FetchDosenNameTask", "Response: " + result);
+                try {
+                    // Parse the result as a JSON object
+                    JSONObject jsonObject = new JSONObject(result);
+
+                    if (jsonObject.getString("status").equals("success")) {
+                        JSONArray mahasiswaArray = jsonObject.getJSONArray("mahasiswa");
+
+                        if (mahasiswaArray.length() > 0) {
+                            JSONObject mahasiswaObject = mahasiswaArray.getJSONObject(0);
+
+                            if (mahasiswaObject.has("Nama Dosen PA")) {
+                                String namaDosen = mahasiswaObject.getString("Nama Dosen PA");
+
+                                // Update TextView with fetched data
+                                namaPaTextView.setText("PA."+namaDosen);
+
+                                Log.d("FetchDosenNameTask", "Nama Dosen PA: " + namaDosen);
+                            } else {
+                                Log.e("FetchDosenNameTask", "Nama Dosen PA not found in response.");
+                            }
+                        } else {
+                            Log.e("FetchDosenNameTask", "Empty mahasiswa array in response.");
+                        }
+                    } else {
+                        Log.e("FetchDosenNameTask", "Response status is not success.");
+                    }
+
+                } catch (JSONException e) {
+                    Log.e("FetchDosenNameTask", "JSON parsing error: " + e.getMessage());
+                }
+            } else {
+                Log.e("FetchDosenNameTask", "Failed to fetch data. Result is null.");
             }
         }
     }

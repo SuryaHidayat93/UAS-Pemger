@@ -6,6 +6,7 @@
     android:orientation="horizontal"
     android:padding="12dp"
     android:background="@color/white"
+    android:id="@+id/toolbar_mahasiswa"
     >
 
     <ImageView
@@ -25,6 +26,7 @@
         android:textStyle="bold" />
 
     <TextView
+        android:id="@+id/nama_pa"
         android:layout_width="125dp"
         android:layout_height="wrap_content"
         android:text="PA. Siti Ramadhani"

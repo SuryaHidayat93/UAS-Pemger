@@ -40,7 +40,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         username = findViewById(R.id.username);
         password = findViewById(R.id.password);
         loginButton = findViewById(R.id.loginButton);
-        forgotPasswordTextView = findViewById(R.id.forgotPasswordTextView); // Add this line
+        forgotPasswordTextView = findViewById(R.id.forgotpassword); // Add this line
 
         loginButton.setOnClickListener(this);
         forgotPasswordTextView.setOnClickListener(this); // Add this line
@@ -54,7 +54,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
             // Lakukan login
             new LoginTask().execute(inputUsername, inputPassword);
-        } else if (v.getId() == R.id.forgotPasswordTextView) { // Add this block
+        } else if (v.getId() == R.id.forgotpassword) { // Add this block
             Intent intent = new Intent(LoginActivity.this, LupaPasswordActivity.class);
             startActivity(intent);
         }
