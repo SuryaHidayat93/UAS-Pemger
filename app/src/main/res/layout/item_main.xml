@@ -52,7 +52,7 @@
                 android:id="@+id/name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:fontFamily="serif"
+                android:fontFamily="@font/montserrat_bold"
                 android:layout_marginLeft="10dp"
                 android:layout_marginBottom="10dp"
                 android:textColor="@color/black"
@@ -60,7 +60,7 @@
                 tools:text="Nama" />
 
             <TextView
-                android:fontFamily="serif"
+                android:fontFamily="@font/montserrat_regular"
                 android:id="@+id/nim"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -72,7 +72,7 @@
                 tools:text="NIM" />
 
             <TextView
-                android:fontFamily="serif"
+                android:fontFamily="@font/montserrat_regular"
                 android:id="@+id/semester"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

@@ -102,7 +102,7 @@ public class RiwayatDosenActivity extends AppCompatActivity implements MyAdapter
                         List<Student> mahasiswaList = dosenList.get(0).getMahasiswa();
                         data.clear();
                         for (Student student : mahasiswaList) {
-                            data.add(new Item("Nama: " + student.getNama(), "Nim: " + student.getNIM(), "Semester " + student.getSemester(), R.drawable.gambar1));
+                            data.add(new Item( student.getNama(), student.getNIM(), "Semester " + student.getSemester(), R.drawable.gambar1));
                         }
                         adapter.notifyDataSetChanged();
                     }
