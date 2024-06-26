@@ -18,6 +18,7 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.util.LruCache;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -296,14 +297,58 @@ public class SetoranMahasiswaActivity extends AppCompatActivity {
             }
         }
     }
+
+    //mengunduh gambar
     public void saveBitmap(View view) {
-        Bitmap bitmap = getRecyclerViewScreenshot(recyclerView);
-        if (bitmap != null) {
-            saveBitmap(bitmap, "screenshot.png");
+        // Create bitmap for header
+        Bitmap headerBitmap = createHeaderBitmap();
+
+        // Get the bitmap for the RecyclerView
+        Bitmap recyclerViewBitmap = getRecyclerViewScreenshot(recyclerView);
+
+        if (recyclerViewBitmap != null && headerBitmap != null) {
+            // Combine both bitmaps
+            Bitmap finalBitmap = combineBitmaps(headerBitmap, recyclerViewBitmap);
+            saveBitmap(finalBitmap, "screenshot.png");
         } else {
-            Log.e(TAG, "Failed to capture screenshot from RecyclerView");
+            Log.e(TAG, "Failed to capture screenshot from RecyclerView or header");
         }
     }
+
+    private void saveBitmap(Bitmap bitmap, String filename) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            ContentValues contentValues = new ContentValues();
+            contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, filename);
+            contentValues.put(MediaStore.MediaColumns.MIME_TYPE, "image/png");
+            contentValues.put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_PICTURES);
+
+            Uri uri = getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues);
+
+            if (uri != null) {
+                try (OutputStream outputStream = getContentResolver().openOutputStream(uri)) {
+                    if (outputStream != null) {
+                        bitmap.compress(CompressFormat.PNG, 100, outputStream);
+                        Toast.makeText(this, "Screenshot saved", Toast.LENGTH_SHORT).show();
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    Toast.makeText(this, "Failed to save screenshot", Toast.LENGTH_SHORT).show();
+                }
+            }
+        } else {
+            File directory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+            File file = new File(directory, filename);
+
+            try (FileOutputStream outputStream = new FileOutputStream(file)) {
+                bitmap.compress(CompressFormat.PNG, 100, outputStream);
+                Toast.makeText(this, "Screenshot saved", Toast.LENGTH_SHORT).show();
+            } catch (IOException e) {
+                e.printStackTrace();
+                Toast.makeText(this, "Failed to save screenshot", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
 
     private Bitmap getRecyclerViewScreenshot(RecyclerView view) {
         RecyclerView.Adapter adapter = view.getAdapter();
@@ -347,36 +392,34 @@ public class SetoranMahasiswaActivity extends AppCompatActivity {
         return bigBitmap;
     }
 
-    private void saveBitmap(Bitmap bitmap, String fileName) {
-        OutputStream outputStream;
-        try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                ContentValues values = new ContentValues();
-                values.put(MediaStore.Images.Media.DISPLAY_NAME, fileName);
-                values.put(MediaStore.Images.Media.MIME_TYPE, "image/png");
-                values.put(MediaStore.Images.Media.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS);
-                Uri uri = getContentResolver().insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, values);
-                outputStream = getContentResolver().openOutputStream(uri);
-            } else {
-                File directory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-                if (!directory.exists()) {
-                    directory.mkdirs();
-                }
-                File file = new File(directory, fileName);
-                outputStream = new FileOutputStream(file);
-            }
+    private Bitmap createHeaderBitmap() {
+        // Inflate header layout
+        View headerView = LayoutInflater.from(this).inflate(R.layout.table_header, null);
+        headerView.measure(View.MeasureSpec.makeMeasureSpec(recyclerView.getWidth(), View.MeasureSpec.EXACTLY),
+                View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+        headerView.layout(0, 0, headerView.getMeasuredWidth(), headerView.getMeasuredHeight());
 
-            bitmap.compress(CompressFormat.PNG, 100, outputStream);
-            outputStream.flush();
-            outputStream.close();
+        // Create bitmap
+        Bitmap headerBitmap = Bitmap.createBitmap(headerView.getMeasuredWidth(), headerView.getMeasuredHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(headerBitmap);
+        headerView.draw(canvas);
 
-            Toast.makeText(this, "Download successfully", Toast.LENGTH_SHORT).show();
-        } catch (IOException e) {
-            Log.e(TAG, "Error saving screenshot", e);
-            Toast.makeText(this, "Failed to save screenshot", Toast.LENGTH_SHORT).show();
-        }
+        return headerBitmap;
+    }
+    private Bitmap combineBitmaps(Bitmap header, Bitmap recyclerViewBitmap) {
+        int width = Math.max(header.getWidth(), recyclerViewBitmap.getWidth());
+        int totalHeight = header.getHeight() + recyclerViewBitmap.getHeight();
+
+        Bitmap combinedBitmap = Bitmap.createBitmap(width, totalHeight, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(combinedBitmap);
+        canvas.drawColor(Color.WHITE);
+        canvas.drawBitmap(header, 0, 0, null);
+        canvas.drawBitmap(recyclerViewBitmap, 0, header.getHeight(), null);
+
+        return combinedBitmap;
     }
     public void downloadScreenshot(View view) {
-        saveBitmap(view);  // Panggil metode saveBitmap yang sudah ada
+        saveBitmap(view);
     }
+
 }
