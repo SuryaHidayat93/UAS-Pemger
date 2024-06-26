@@ -1,6 +1,5 @@
 package com.example.utspemhir;
 
-import android.app.AlertDialog;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -23,7 +22,6 @@ import java.util.List;
 
 public class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    private static final int VIEW_TYPE_HEADER = 0;
     private static final int VIEW_TYPE_ITEM = 1;
 
     private List<DataModel> dataList;
@@ -37,41 +35,27 @@ public class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        if (viewType == VIEW_TYPE_HEADER) {
-            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_header_table, parent, false);
-            return new HeaderViewHolder(view);
-        } else {
-            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_row_layout, parent, false);
-            return new ItemViewHolder(view);
-        }
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_row_layout, parent, false);
+        return new ItemViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder viewHolder, int position) {
         if (viewHolder instanceof ItemViewHolder) {
-            DataModel data = dataList.get(position - 1); // Adjust position to account for header
+            DataModel data = dataList.get(position);
             ItemViewHolder holder = (ItemViewHolder) viewHolder;
             holder.textViewTanggal.setText(data.getTanggal());
             holder.textViewSurah.setText(data.getSurah());
             holder.textViewKelancaran.setText(data.getKelancaran());
             holder.textViewTajwid.setText(data.getTajwid());
             holder.textViewMakhrajulHuruf.setText(data.getMakhrajulHuruf());
-
-
         }
     }
 
     @Override
     public int getItemCount() {
-        return dataList.size() + 1; // Add 1 for the header
+        return dataList.size();
     }
-
-    @Override
-    public int getItemViewType(int position) {
-        return position == 0 ? VIEW_TYPE_HEADER : VIEW_TYPE_ITEM;
-    }
-
-
 
     private class DeleteSetoranTask extends AsyncTask<Void, Void, Boolean> {
         private int idSetoran;
@@ -123,21 +107,12 @@ public class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         @Override
         protected void onPostExecute(Boolean success) {
             if (success) {
-                dataList.remove(position - 1); // Adjust position to account for header
+                dataList.remove(position);
                 notifyItemRemoved(position);
                 Toast.makeText(context, "Setoran berhasil dihapus", Toast.LENGTH_SHORT).show();
             } else {
                 Toast.makeText(context, "Gagal menghapus setoran", Toast.LENGTH_SHORT).show();
             }
-        }
-    }
-
-    public static class HeaderViewHolder extends RecyclerView.ViewHolder {
-        // Define header views here
-
-        public HeaderViewHolder(@NonNull View itemView) {
-            super(itemView);
-            // Initialize header views
         }
     }
 
