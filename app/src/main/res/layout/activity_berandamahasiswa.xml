@@ -161,7 +161,8 @@
                         android:layout_below="@id/txtkp"
                         android:layout_marginLeft="20dp"
                         android:layout_width="280dp"
-                        android:background="@drawable/custom_progressbar2"
+
+                        android:progressDrawable="@drawable/custom_progressbar2"
                         android:layout_height="5dp"
                         style="?android:attr/progressBarStyleHorizontal"
                         android:max="100"
@@ -195,7 +196,7 @@
                         android:layout_width="280dp"
                         android:layout_height="5dp"
                         style="?android:attr/progressBarStyleHorizontal"
-                        android:background="@drawable/custom_progressbar2"/>
+                        android:progressDrawable="@drawable/custom_progressbar2"/>
 
 
 

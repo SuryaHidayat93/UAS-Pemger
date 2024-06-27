@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
+import android.animation.ValueAnimator;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -223,6 +224,7 @@ public class BerandaMahasiswaActivity extends AppCompatActivity {
         }
 
 
+
         @Override
         protected void onPostExecute(String result) {
             if (result != null) {
@@ -241,12 +243,12 @@ public class BerandaMahasiswaActivity extends AppCompatActivity {
                             // Update progress bars with fetched data
                             if (lang.equals("Kerja Praktek")) {
                                 ProgressBar progressBarKP = findViewById(R.id.barkp);
-                                progressBarKP.setProgress(percent);
+                                animateProgressBar(progressBarKP, percent);
                                 TextView textViewKP = findViewById(R.id.precentagekp);
                                 textViewKP.setText(percent + "%");
                             } else if (lang.equals("Seminar Kerja Praktek")) {
                                 ProgressBar progressBarSeminarKP = findViewById(R.id.barskp);
-                                progressBarSeminarKP.setProgress(percent);
+                                animateProgressBar(progressBarSeminarKP, percent);
                                 TextView textViewSeminarKP = findViewById(R.id.precentageskp);
                                 textViewSeminarKP.setText(percent + "%");
                             }
@@ -263,7 +265,12 @@ public class BerandaMahasiswaActivity extends AppCompatActivity {
                 Log.e("FetchProgressDataTask", "Failed to fetch data. Result is null.");
             }
         }
-
+        private void animateProgressBar(ProgressBar progressBar, int toProgress) {
+            ValueAnimator animator = ValueAnimator.ofInt(progressBar.getProgress(), toProgress);
+            animator.setDuration(1000); // Duration of the animation in milliseconds
+            animator.addUpdateListener(animation -> progressBar.setProgress((int) animation.getAnimatedValue()));
+            animator.start();
+        }
     }
 
 
@@ -417,4 +424,5 @@ public class BerandaMahasiswaActivity extends AppCompatActivity {
             }
         }
     }
+
 }
