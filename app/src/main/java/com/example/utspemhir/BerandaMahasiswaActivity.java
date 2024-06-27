@@ -12,6 +12,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -33,7 +34,8 @@ public class BerandaMahasiswaActivity extends AppCompatActivity {
     TextView nimTextView;
     TextView semesterTextView;
     TextView namaTextView;
-    TextView namaPaTextView; // TextView untuk nama dosen
+    TextView namaPaTextView;// TextView untuk nama dosen
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +69,11 @@ public class BerandaMahasiswaActivity extends AppCompatActivity {
 
         // Lakukan permintaan data menggunakan AsyncTask
         new FetchNIMDataTask().execute();
+        new FetchProgressDataTask().execute();
+    }
+    public void detail(View view) {
+        Intent intent = new Intent(BerandaMahasiswaActivity.this, ActivityProgress.class);
+        startActivity(intent);
     }
 
     public void ClickMenu(View view) {
@@ -182,6 +189,85 @@ public class BerandaMahasiswaActivity extends AppCompatActivity {
             }
         }
     }
+    private class FetchProgressDataTask extends AsyncTask<Void, Void, String> {
+
+        @Override
+        protected String doInBackground(Void... voids) {
+
+            SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
+            String nim = sharedPreferences.getString("nim", "");
+            String urlString = "https://samatif.xyz/setoran/sudahbelum.php?nim=" + nim;
+            try {
+                URL url = new URL(urlString);
+                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                connection.setRequestMethod("GET");
+                connection.setRequestProperty("Authorization", "Bearer " + token);
+
+                int responseCode = connection.getResponseCode();
+                if (responseCode == HttpURLConnection.HTTP_OK) {
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                    StringBuilder response = new StringBuilder();
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        response.append(line);
+                    }
+                    reader.close();
+                    return response.toString();
+                } else {
+                    Log.e("FetchProgressDataTask", "Failed to fetch data. Response code: " + responseCode);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+
+        @Override
+        protected void onPostExecute(String result) {
+            if (result != null) {
+                Log.d("FetchProgressDataTask", "Response pre: " + result);
+                try {
+                    JSONObject jsonObject = new JSONObject(result);
+
+                    if (jsonObject.has("percentages")) {
+                        JSONArray percentagesArray = jsonObject.getJSONArray("percentages");
+
+                        for (int i = 0; i < percentagesArray.length(); i++) {
+                            JSONObject percentageObject = percentagesArray.getJSONObject(i);
+                            String lang = percentageObject.getString("lang");
+                            int percent = percentageObject.getInt("percent");
+
+                            // Update progress bars with fetched data
+                            if (lang.equals("Kerja Praktek")) {
+                                ProgressBar progressBarKP = findViewById(R.id.barkp);
+                                progressBarKP.setProgress(percent);
+                                TextView textViewKP = findViewById(R.id.precentagekp);
+                                textViewKP.setText(percent + "%");
+                            } else if (lang.equals("Seminar Kerja Praktek")) {
+                                ProgressBar progressBarSeminarKP = findViewById(R.id.barskp);
+                                progressBarSeminarKP.setProgress(percent);
+                                TextView textViewSeminarKP = findViewById(R.id.precentageskp);
+                                textViewSeminarKP.setText(percent + "%");
+                            }
+                        }
+
+                    } else {
+                        Log.e("FetchProgressDataTask", "Percentage data not found in response.");
+                    }
+
+                } catch (JSONException e) {
+                    Log.e("FetchProgressDataTask", "JSON parsing error: " + e.getMessage());
+                }
+            } else {
+                Log.e("FetchProgressDataTask", "Failed to fetch data. Result is null.");
+            }
+        }
+
+    }
+
+
+
 
     private class FetchMahasiswaDataTask extends AsyncTask<String, Void, String> {
 
