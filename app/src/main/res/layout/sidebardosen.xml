@@ -20,17 +20,6 @@
             android:layout_weight="1">
         </LinearLayout>
 
-<!--        <LinearLayout-->
-<!--            android:layout_width="0dp"-->
-<!--            android:layout_height="match_parent"-->
-<!--            android:layout_weight="3">-->
-
-<!--            <de.hdodenhof.circleimageview.CircleImageView-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="match_parent"-->
-<!--                android:src="@drawable/gambar1"/>-->
-<!--        </LinearLayout>-->
-
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
@@ -59,8 +48,6 @@
                 android:textSize="20sp"
                 android:text="nim"
                 android:textColor="@android:color/white"/>
-
-
         </LinearLayout>
 
         <LinearLayout
@@ -72,101 +59,109 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:background="#1e293b"
-        android:gravity="center_vertical"
-        android:onClick="beranda">
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical">
 
-        <TextView
-            android:layout_width="0dp"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:padding="15dp"
-            android:fontFamily="@font/montserrat_regular"
-            android:text="Beranda"
-            android:textColor="@color/white"
-            android:textSize="20dp"
-            app:layout_constraintStart_toEndOf="@+id/imageView1"
-            tools:layout_editor_absoluteY="0dp" />
+            android:orientation="horizontal"
+            android:background="#1e293b"
+            android:gravity="center_vertical"
+            android:onClick="beranda">
 
-        <ImageView
-            android:id="@+id/imageView1"
-            android:layout_width="46dp"
-            android:layout_height="30dp"
-            android:layout_margin="48px"
-            android:src="@drawable/baseline_home_24"
-            tools:layout_editor_absoluteX="10dp"
-            tools:layout_editor_absoluteY="13dp" />
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:padding="15dp"
+                android:fontFamily="@font/montserrat_regular"
+                android:text="Beranda"
+                android:textColor="@color/white"
+                android:textSize="20dp"
+                app:layout_constraintStart_toEndOf="@+id/imageView1"
+                tools:layout_editor_absoluteY="0dp" />
+
+            <ImageView
+                android:id="@+id/imageView1"
+                android:layout_width="46dp"
+                android:layout_height="30dp"
+                android:layout_margin="48px"
+                android:src="@drawable/baseline_home_24"
+                tools:layout_editor_absoluteX="10dp"
+                tools:layout_editor_absoluteY="13dp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:background="#1e293b"
+            android:gravity="center_vertical"
+            android:onClick="setoran">
+
+            <TextView
+                android:fontFamily="@font/montserrat_regular"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:padding="15dp"
+                android:text="Setoran"
+                android:textColor="@color/white"
+                android:textSize="20dp"
+                app:layout_constraintStart_toEndOf="@+id/imageView2"
+                tools:layout_editor_absoluteY="0dp" />
+
+            <ImageView
+                android:id="@+id/imageView2"
+                android:layout_width="46dp"
+                android:layout_height="30dp"
+                android:layout_margin="48px"
+                android:src="@drawable/baseline_book_24"
+                tools:layout_editor_absoluteX="10dp"
+                tools:layout_editor_absoluteY="13dp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:background="#1e293b"
+            android:gravity="center_vertical"
+            android:onClick="riwayat">
+
+            <TextView
+                android:fontFamily="@font/montserrat_regular"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:padding="15dp"
+                android:text="Riwayat"
+                android:textColor="@color/white"
+                android:textSize="20dp"
+                app:layout_constraintStart_toEndOf="@+id/imageView3"
+                tools:layout_editor_absoluteY="0dp" />
+
+            <ImageView
+                android:id="@+id/imageView3"
+                android:layout_width="46dp"
+                android:layout_height="30dp"
+                android:layout_margin="48px"
+                android:src="@drawable/baseline_check_box_24"
+                tools:layout_editor_absoluteX="10dp"
+                tools:layout_editor_absoluteY="13dp" />
+        </LinearLayout>
+
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
         android:background="#1e293b"
         android:gravity="center_vertical"
-        android:onClick="setoran">
-
-        <TextView
-            android:fontFamily="@font/montserrat_regular"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:padding="15dp"
-            android:text="Setoran"
-            android:textColor="@color/white"
-            android:textSize="20dp"
-            app:layout_constraintStart_toEndOf="@+id/imageView2"
-            tools:layout_editor_absoluteY="0dp" />
-
-        <ImageView
-            android:id="@+id/imageView2"
-            android:layout_width="46dp"
-            android:layout_height="30dp"
-            android:layout_margin="48px"
-            android:src="@drawable/baseline_book_24"
-            tools:layout_editor_absoluteX="10dp"
-            tools:layout_editor_absoluteY="13dp" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:background="#1e293b"
-        android:gravity="center_vertical"
-        android:onClick="riwayat">
-
-        <TextView
-            android:fontFamily="@font/montserrat_regular"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:padding="15dp"
-            android:text="Riwayat"
-            android:textColor="@color/white"
-            android:textSize="20dp"
-            app:layout_constraintStart_toEndOf="@+id/imageView3"
-            tools:layout_editor_absoluteY="0dp" />
-
-        <ImageView
-            android:id="@+id/imageView3"
-            android:layout_width="46dp"
-            android:layout_height="30dp"
-            android:layout_margin="48px"
-            android:src="@drawable/baseline_check_box_24"
-            tools:layout_editor_absoluteX="10dp"
-            tools:layout_editor_absoluteY="13dp" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="#1e293b"
-        android:layout_marginTop="350dp"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
+        android:layout_gravity="bottom"
         android:onClick="logout">
 
         <TextView
